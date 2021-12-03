@@ -1,0 +1,7 @@
+/MDK-ARM/*.lst
+/MDK-ARM/YS-H7Multi.uvguix.*
+/MDK-ARM/YS-H7Multi
+/STM32CubeIDE/Debug
+/STM32CubeIDE/Release
+/STM32CubeIDE/.settings
+/MDK-ARM/JLinkLog.txt
