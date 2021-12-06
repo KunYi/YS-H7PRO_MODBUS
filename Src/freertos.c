@@ -73,6 +73,9 @@ const osThreadAttr_t myMBSlaveTask_attributes = {
 /* USER CODE BEGIN FunctionPrototypes */
 extern void InitModbusMaster(void);
 extern void InitModbusSlave(void);
+
+extern void vRegisterSampleCLICommands(void);
+extern void vUARTCommandConsoleStart( uint16_t usStackSize, UBaseType_t uxPriority );
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
@@ -90,6 +93,8 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 	InitModbusMaster();
 	InitModbusSlave();
+
+
   /* USER CODE END Init */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -120,6 +125,8 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+  vRegisterSampleCLICommands();
+  vUARTCommandConsoleStart((256 * 4), osPriorityIdle);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */

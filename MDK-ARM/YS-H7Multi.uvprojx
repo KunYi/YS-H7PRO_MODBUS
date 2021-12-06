@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32H743xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../SEGGER_RTT;../ModbusLib/Inc</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32H7xx_HAL_Driver/Inc;../Drivers/STM32H7xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Drivers/CMSIS/Device/ST/STM32H7xx/Include;../Drivers/CMSIS/Include;../SEGGER_RTT;../ModbusLib/Inc;../FreeRTOS_CLI</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -432,6 +432,31 @@
               <FileName>mb_app.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\mb_app.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Applications/CLI</GroupName>
+          <Files>
+            <File>
+              <FileName>FreeRTOS_CLI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FreeRTOS_CLI\FreeRTOS_CLI.c</FilePath>
+            </File>
+            <File>
+              <FileName>UARTCommandConsole.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FreeRTOS_CLI\UARTCommandConsole.c</FilePath>
+            </File>
+            <File>
+              <FileName>serial.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FreeRTOS_CLI\serial.c</FilePath>
+            </File>
+            <File>
+              <FileName>Sample-CLI-commands.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FreeRTOS_CLI\Sample-CLI-commands.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -606,6 +631,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>ModbusLib</GroupName>
+          <Files>
+            <File>
+              <FileName>Modbus.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ModbusLib\Src\Modbus.c</FilePath>
+            </File>
+            <File>
+              <FileName>UARTCallback.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\ModbusLib\Src\UARTCallback.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>Segger/RTT</GroupName>
           <Files>
             <File>
@@ -622,21 +662,6 @@
               <FileName>SEGGER_RTT_Syscalls_KEIL.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\SEGGER_RTT\SEGGER_RTT_Syscalls_KEIL.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>ModbusLib</GroupName>
-          <Files>
-            <File>
-              <FileName>Modbus.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ModbusLib\Src\Modbus.c</FilePath>
-            </File>
-            <File>
-              <FileName>UARTCallback.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\ModbusLib\Src\UARTCallback.c</FilePath>
             </File>
           </Files>
         </Group>
