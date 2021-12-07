@@ -37,7 +37,7 @@ uint16_t        u16EC;
 uint16_t        u16PH;
 uint16_t        u16Temp1Array[4];
 uint16_t        u16Temp2Array[4];
-uint16_t				u16DIO;
+uint16_t        u16DIO;
 struct SystemStatus*  pSysStatus=(struct SystemStatus*)SysStatus;
 
 void InitModbusMaster(void);
@@ -52,7 +52,7 @@ void StartModbusMasterTask(void *argument)
 {
   for(;;) {
     ModbusMasterProc();
-    osDelay(400);
+    osDelay(10);
   }
 }
 
@@ -76,15 +76,16 @@ static void ModbusMasterProc(void) {
   telegram.u16CoilsNo = 1; // number of elements (coils or registers) to read
   telegram.u16reg = &u16EC; // pointer to a memory array in the Arduino
   ModbusQuery(&ModbusMasterH, telegram);
-  u32NotificationValue = ulTaskNotifyTake(pdTRUE, 500);
+  u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
   if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
     // error handler
     SEGGER_RTT_printf(0, RTT_CTRL_TEXT_BRIGHT_RED "read EC failed\r\n");
+    SEGGER_RTT_printf(0, RTT_CTRL_RESET);		
   } else {
-    SEGGER_RTT_printf(0, RTT_CTRL_CLEAR "read EC:0x%04X(%d)\r\n", u16EC, u16EC);
+    SEGGER_RTT_printf(0, "read EC:0x%04X(%d)\r\n", u16EC, u16EC);
     pSysStatus->EC = u16EC;
   }
-  osDelay(10);
+  osDelay(1);
 
   telegram.u8id = SENSOR_PH; // slave address
   telegram.u8fct = MB_FC_READ_REGISTERS; // function code 03, only support the code
@@ -92,15 +93,16 @@ static void ModbusMasterProc(void) {
   telegram.u16CoilsNo = 1; // number of elements (coils or registers) to read
   telegram.u16reg = &u16PH; // pointer to a memory array in the Arduino
   ModbusQuery(&ModbusMasterH, telegram);
-  u32NotificationValue = ulTaskNotifyTake(pdTRUE, 500);
+  u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
   if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
     // error handler
     SEGGER_RTT_printf(0, RTT_CTRL_TEXT_BRIGHT_RED "read PH failed\r\n");
+    SEGGER_RTT_printf(0, RTT_CTRL_RESET);
   } else {
-    SEGGER_RTT_printf(0, RTT_CTRL_CLEAR "read PH:0x%04X(%d)\r\n", u16PH, u16PH);
+    SEGGER_RTT_printf(0, "read PH:0x%04X(%d)\r\n", u16PH, u16PH);
     pSysStatus->PH = u16PH;
   }
-  osDelay(10);
+  osDelay(1);
 
   telegram.u8id = SENSOR_TEMP1;
   telegram.u8fct = MB_FC_READ_REGISTERS; // function code
@@ -108,19 +110,20 @@ static void ModbusMasterProc(void) {
   telegram.u16CoilsNo = 4;
   telegram.u16reg = u16Temp1Array;
   ModbusQuery(&ModbusMasterH, telegram);
-  u32NotificationValue = ulTaskNotifyTake(pdTRUE, 500);
+  u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
   if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
     // error handler
     SEGGER_RTT_printf(0, RTT_CTRL_TEXT_BRIGHT_RED "read temperature failed\r\n");
+    SEGGER_RTT_printf(0, RTT_CTRL_RESET);	
   } else {
-    SEGGER_RTT_printf(0, RTT_CTRL_CLEAR "read Temp1 ch0:%d ch1:%d ch2:%d ch3:%d\r\n",
+    SEGGER_RTT_printf(0, "read Temp1 ch0:%d ch1:%d ch2:%d ch3:%d\r\n",
     u16Temp1Array[0], u16Temp1Array[1], u16Temp1Array[2], u16Temp1Array[3]);
     pSysStatus->TempIn1 = u16Temp1Array[0];
     pSysStatus->TempOutput1 = u16Temp1Array[1];
     pSysStatus->TempIn2 = u16Temp1Array[2];
     pSysStatus->TempOutput2 = u16Temp1Array[2];
   }
-  osDelay(10);
+  osDelay(1);
 
   telegram.u8id = SENSOR_TEMP2;
   telegram.u8fct = MB_FC_READ_REGISTERS; // function code
@@ -128,19 +131,20 @@ static void ModbusMasterProc(void) {
   telegram.u16CoilsNo = 4;
   telegram.u16reg = u16Temp2Array;
   ModbusQuery(&ModbusMasterH, telegram);
-  u32NotificationValue = ulTaskNotifyTake(pdTRUE, 500);
+  u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
   if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
     // error handler
     SEGGER_RTT_printf(0, RTT_CTRL_TEXT_BRIGHT_RED "read temperature failed\r\n");
+    SEGGER_RTT_printf(0, RTT_CTRL_RESET);
   } else {
-    SEGGER_RTT_printf(0, RTT_CTRL_CLEAR "read Temp2 ch0:%d ch1:%d ch2:%d ch3:%d\r\n",
+    SEGGER_RTT_printf(0, "read Temp2 ch0:%d ch1:%d ch2:%d ch3:%d\r\n",
     u16Temp2Array[0], u16Temp2Array[1], u16Temp2Array[2], u16Temp2Array[3]);
     pSysStatus->TempIn3 = u16Temp2Array[0];
     pSysStatus->TempOutput3 = u16Temp2Array[1];
     pSysStatus->TempIn4 = u16Temp2Array[2];
     pSysStatus->TempOutput4 = u16Temp2Array[2];
   }
-  osDelay(10);
+  osDelay(1);
 
   telegram.u8id = MB_DIO;
   telegram.u8fct = MB_FC_WRITE_REGISTER; // function code
@@ -149,12 +153,13 @@ static void ModbusMasterProc(void) {
   telegram.u16reg = &u16DIO;
   ModbusQuery(&ModbusMasterH, telegram);
   u16DIO++;
-  u32NotificationValue = ulTaskNotifyTake(pdTRUE, 500);
+  u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
   if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
     // error handler
     SEGGER_RTT_printf(0, RTT_CTRL_TEXT_BRIGHT_RED "write DIO failed\r\n");
+    SEGGER_RTT_printf(0, RTT_CTRL_RESET);	
   } else {
-    SEGGER_RTT_printf(0, RTT_CTRL_CLEAR "write DIO:%04X(%03d)\r\n", u16DIO, u16DIO);
+    SEGGER_RTT_printf(0, "write DIO:%04X(%03d)\r\n", u16DIO, u16DIO);
   }
 }
 
