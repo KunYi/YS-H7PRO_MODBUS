@@ -82,6 +82,11 @@ static BaseType_t prvThreeParameterEchoCommand( char *pcWriteBuffer, size_t xWri
 static BaseType_t prvParameterEchoCommand( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString );
 
 /*
+ * Implements the rtc command.
+ */
+static BaseType_t prvRTCProcCommand( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString );
+
+/*
  * Implements the "query heap" command.
  */
 #if( configINCLUDE_QUERY_HEAP_COMMAND == 1 )
@@ -162,6 +167,13 @@ static const CLI_Command_Definition_t xParameterEcho =
 	};
 #endif /* configINCLUDE_TRACE_RELATED_CLI_COMMANDS */
 
+static const CLI_Command_Definition_t xRTCProc =
+	{
+		"rtc",
+		"\r\nrtc [date/time]: display current RTC or setting the RTC\r\n",
+		prvRTCProcCommand,
+		-1
+	};
 /*-----------------------------------------------------------*/
 
 void vRegisterSampleCLICommands( void )
@@ -170,6 +182,7 @@ void vRegisterSampleCLICommands( void )
 	FreeRTOS_CLIRegisterCommand( &xTaskStats );
 	FreeRTOS_CLIRegisterCommand( &xThreeParameterEcho );
 	FreeRTOS_CLIRegisterCommand( &xParameterEcho );
+	FreeRTOS_CLIRegisterCommand( &xRTCProc );
 
 	#if( configGENERATE_RUN_TIME_STATS == 1 )
 	{
@@ -478,3 +491,33 @@ static UBaseType_t uxParameterNumber = 0;
 	}
 
 #endif /* configINCLUDE_TRACE_RELATED_CLI_COMMANDS */
+
+static BaseType_t prvRTCProcCommand( char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString )
+{
+const char *pcParameter;
+BaseType_t xParameterStringLength, xReturn;
+
+
+	/* Remove compile time warnings about unused parameters, and check the
+	write buffer is not NULL.  NOTE - for simplicity, this example assumes the
+	write buffer length is adequate, so does not check for buffer overflows. */
+	( void ) pcCommandString;
+	( void ) xWriteBufferLen;
+	configASSERT( pcWriteBuffer );
+
+	/* Obtain the parameter string. */
+	pcParameter = FreeRTOS_CLIGetParameter
+					(
+						pcCommandString,		/* The command string itself. */
+						1,		/* Return the next parameter. */
+						&xParameterStringLength	/* Store the parameter string length. */
+					);
+	if( pcParameter != NULL )
+	{
+		sprintf( pcWriteBuffer, "setting RTC to %s\r\n", pcParameter);
+	}
+	else {
+		sprintf( pcWriteBuffer, "current RTC time:\r\n");
+	}
+	return pdFALSE;
+}
