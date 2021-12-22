@@ -10,7 +10,7 @@
 #include "task.h"
 #include "main.h"
 #include "Modbus.h"
-#include "usart.h"
+
 
 /**
  * @brief
@@ -48,8 +48,6 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 
 }
 
-extern uint8_t aRxBuffer;
-extern QueueHandle_t xRxedChars;
 /**
  * @brief
  * This is the callback for HAL interrupt of UART RX
@@ -85,12 +83,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 	 *
 	 *
 	 * */
-
-	if (UartHandle == &huart3) {
-        xQueueSendFromISR(xRxedChars, &aRxBuffer, &xHigherPriorityTaskWoken);
-
-        HAL_UART_Receive_IT(&huart3, &aRxBuffer, 1);
-	}
 
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
