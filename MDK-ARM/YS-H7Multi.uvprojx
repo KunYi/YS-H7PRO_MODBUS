@@ -399,6 +399,16 @@
               <FilePath>..\Src\mb_app.c</FilePath>
             </File>
             <File>
+              <FileName>mb_iot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\mb_iot.c</FilePath>
+            </File>
+            <File>
+              <FileName>mb_settings.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\mb_settings.c</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/main.c</FilePath>

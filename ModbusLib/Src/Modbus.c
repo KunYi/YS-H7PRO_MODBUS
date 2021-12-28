@@ -1674,6 +1674,7 @@ static int8_t validateCoils(modbusHandler_t *modH)
     return u8CopyBufferSize;
 }
 
+#if 0
 /**
  * @brief
  * This method check have support regs functions
@@ -1693,6 +1694,7 @@ static int8_t validateRegs(modbusHandler_t *modH)
     }
     return u8CopyBufferSize;
 }
+#endif
 /**
  * @brief
  * This method processes functions 1 & 2

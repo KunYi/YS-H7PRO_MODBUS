@@ -61,10 +61,18 @@ const osThreadAttr_t myMBMasterTask_attributes = {
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
-/* Definitions for myMBSlaveTask */
-osThreadId_t myMBSlaveTaskHandle;
-const osThreadAttr_t myMBSlaveTask_attributes = {
-  .name = "myMBSlaveTask",
+/* Definitions for myMBSettingsTask */
+osThreadId_t myMBSettingsTaskHandle;
+const osThreadAttr_t myMBSettingsTask_attributes = {
+  .name = "myMBSettingsTask",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+
+/* Definitions for myMBIoTTask */
+osThreadId_t myMBIoTTaskHandle;
+const osThreadAttr_t myMBIoTTask_attributes = {
+  .name = "myMBIoTTask",
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
@@ -72,13 +80,15 @@ const osThreadAttr_t myMBSlaveTask_attributes = {
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 extern void InitModbusMaster(void);
-extern void InitModbusSlave(void);
+extern void InitMBSettings(void);
+extern void InitMbIoT(void);
 
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
 extern void StartModbusMasterTask(void *argument);
-extern void StartModbusSlaveTask(void *argument);
+extern void StartMBSettingsTask(void *argument);
+extern void StartMbIoTTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -107,7 +117,8 @@ return 0;
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 	InitModbusMaster();
-	InitModbusSlave();
+	InitMBSettings();
+  InitMbIoT();
 
 
   /* USER CODE END Init */
@@ -136,7 +147,10 @@ void MX_FREERTOS_Init(void) {
   myMBMasterTaskHandle = osThreadNew(StartModbusMasterTask, NULL, &myMBMasterTask_attributes);
 
   /* creation of myMBSlaveTask */
-  myMBSlaveTaskHandle = osThreadNew(StartModbusSlaveTask, NULL, &myMBSlaveTask_attributes);
+  myMBSettingsTaskHandle = osThreadNew(StartMBSettingsTask, NULL, &myMBSettingsTask_attributes);
+
+  /* creation of myMBIoTTask */
+  myMBIoTTaskHandle = osThreadNew(StartMbIoTTask, NULL, &myMBIoTTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -171,4 +185,3 @@ void StartDefaultTask(void *argument)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
-
