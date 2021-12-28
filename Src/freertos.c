@@ -25,7 +25,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
+#include "SEGGER_RTT.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,41 +55,46 @@ const osThreadAttr_t defaultTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for myMBMasterTask */
-osThreadId_t myMBMasterTaskHandle;
-const osThreadAttr_t myMBMasterTask_attributes = {
-  .name = "myMBMasterTask",
+/* Definitions for myMbReadSensors */
+osThreadId_t myMbReadSensorsHandle;
+const osThreadAttr_t myMbReadSensors_attributes = {
+  .name = "myMbReadSensors",
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
-/* Definitions for myMBSettingsTask */
-osThreadId_t myMBSettingsTaskHandle;
-const osThreadAttr_t myMBSettingsTask_attributes = {
-  .name = "myMBSettingsTask",
+/* Definitions for myMbSettingsTas */
+osThreadId_t myMbSettingsTasHandle;
+const osThreadAttr_t myMbSettingsTas_attributes = {
+  .name = "myMbSettingsTas",
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
-
-/* Definitions for myMBIoTTask */
-osThreadId_t myMBIoTTaskHandle;
-const osThreadAttr_t myMBIoTTask_attributes = {
-  .name = "myMBIoTTask",
+/* Definitions for myMbIoTTask */
+osThreadId_t myMbIoTTaskHandle;
+const osThreadAttr_t myMbIoTTask_attributes = {
+  .name = "myMbIoTTask",
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for basic1SecTimer */
+osTimerId_t basic1SecTimerHandle;
+const osTimerAttr_t basic1SecTimer_attributes = {
+  .name = "basic1SecTimer"
 };
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-extern void InitModbusMaster(void);
-extern void InitMBSettings(void);
+extern void InitMbReadSensors(void);
+extern void InitMbSettings(void);
 extern void InitMbIoT(void);
 
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
-extern void StartModbusMasterTask(void *argument);
-extern void StartMBSettingsTask(void *argument);
+extern void StartMbReadSensorsTask(void *argument);
+extern void StartMbSettingsTask(void *argument);
 extern void StartMbIoTTask(void *argument);
+extern void basic1SecCallback(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -116,8 +122,8 @@ return 0;
   */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
-	InitModbusMaster();
-	InitMBSettings();
+  InitMbReadSensors();
+  InitMbSettings();
   InitMbIoT();
 
 
@@ -131,8 +137,13 @@ void MX_FREERTOS_Init(void) {
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
 
+  /* Create the timer(s) */
+  /* creation of basic1SecTimer */
+  basic1SecTimerHandle = osTimerNew(basic1SecCallback, osTimerPeriodic, NULL, &basic1SecTimer_attributes);
+
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
+  osTimerStart(basic1SecTimerHandle, 1000U); /* start Timer 1 second */
   /* USER CODE END RTOS_TIMERS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
@@ -143,14 +154,14 @@ void MX_FREERTOS_Init(void) {
   /* creation of defaultTask */
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
-  /* creation of myMBMasterTask */
-  myMBMasterTaskHandle = osThreadNew(StartModbusMasterTask, NULL, &myMBMasterTask_attributes);
+  /* creation of myMbReadSensors */
+  myMbReadSensorsHandle = osThreadNew(StartMbReadSensorsTask, NULL, &myMbReadSensors_attributes);
 
-  /* creation of myMBSlaveTask */
-  myMBSettingsTaskHandle = osThreadNew(StartMBSettingsTask, NULL, &myMBSettingsTask_attributes);
+  /* creation of myMbSettingsTas */
+  myMbSettingsTasHandle = osThreadNew(StartMbSettingsTask, NULL, &myMbSettingsTas_attributes);
 
-  /* creation of myMBIoTTask */
-  myMBIoTTaskHandle = osThreadNew(StartMbIoTTask, NULL, &myMBIoTTask_attributes);
+  /* creation of myMbIoTTask */
+  myMbIoTTaskHandle = osThreadNew(StartMbIoTTask, NULL, &myMbIoTTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -183,5 +194,9 @@ void StartDefaultTask(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-
+void basic1SecCallback(void *argument)
+{
+  static int count = 0;
+  SEGGER_RTT_printf(0, "1Sec Timer callback: %d \n", ++count);
+}
 /* USER CODE END Application */

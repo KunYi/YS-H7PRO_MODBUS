@@ -18,29 +18,29 @@ static uint16_t        SysSettings[(sizeof(struct SystemSettings)/sizeof(uint16_
 static uint16_t        ModusSlaveDataBuffer[(sizeof(struct SystemSettings)/sizeof(uint16_t))];
 static struct SystemSettings*  pSysSettings=(struct SystemSettings*)SysSettings;
 
-void InitMBSettings(void);
-void StartMBSettingsTask(void *argument);
+void InitMbSettings(void);
+void StartMbSettingsTask(void *argument);
 
-static void ModbusSlaveProc(void);
+static void MbSettingsProc(void);
 
-void StartMBSettingsTask(void *argument)
+void StartMbSettingsTask(void *argument)
 {
   for(;;) {
     xSemaphoreTake(MBSettingsH.ModBusSphrHandle , portMAX_DELAY);
-    ModbusSlaveProc();
+    MbSettingsProc();
     xSemaphoreGive(MBSettingsH.ModBusSphrHandle);
     osDelay(10);
   }
 }
 
-static void ModbusSlaveProc(void) {
+static void MbSettingsProc(void) {
     // HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, (GPIO_PinState)(MBSettingsH.u8coils[0] & (1<<0)));
     // HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, (GPIO_PinState)(MBSettingsH.u8coils[0] & (1<<1)));
     //printf("reg 0:0x%04X, reg 1:0x%04X\r\n", ModbusSlaveH.u16regs[0], ModbusSlaveH.u16regs[1]);
     memcpy(ModusSlaveDataBuffer, pSysSettings, sizeof(SysSettings));
 }
 
-void InitMBSettings(void) {
+void InitMbSettings(void) {
   memset(&SysSettings, 0, sizeof(SysSettings));
   memcpy(ModusSlaveDataBuffer, pSysSettings, sizeof(SysSettings));
   /* Modbus Slave initialization */

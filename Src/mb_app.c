@@ -34,20 +34,20 @@ uint16_t        u16Temp2Array[4];
 uint16_t        u16DIO;
 struct SystemStatus*  pSysStatus=(struct SystemStatus*)SysStatus;
 
-void InitModbusMaster(void);
-static void ModbusMasterProc(void);
-void StartModbusMasterTask(void *argument);
+void InitMbReadSensors(void);
+static void MbReadSensorsProc(void);
+void StartMbReadSensorsTask(void *argument);
 
 
-void StartModbusMasterTask(void *argument)
+void StartMbReadSensorsTask(void *argument)
 {
   for(;;) {
-    ModbusMasterProc();
+    MbReadSensorsProc();
     osDelay(10);
   }
 }
 
-static void ModbusMasterProc(void) {
+static void MbReadSensorsProc(void) {
   modbus_t telegram;
   uint32_t u32NotificationValue;
 
@@ -144,11 +144,7 @@ static void ModbusMasterProc(void) {
   }
 }
 
-static void ModbusIoTProc(void) {
-
-}
-
-void InitModbusMaster(void) {
+void InitMbReadSensors(void) {
   u16EC = 0;
   u16PH = 0;
   for (int i = 0; i < 4; i++) {
