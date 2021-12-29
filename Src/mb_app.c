@@ -13,6 +13,7 @@
 #include "sysStatus.h"
 #include "sysSettings.h"
 #include "SEGGER_RTT.h"
+#include "defaultConfig.h"
 
 /* sensor's slave ID */
 #define SENSOR_EC              (9)

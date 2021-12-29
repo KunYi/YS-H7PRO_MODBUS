@@ -33,15 +33,15 @@ struct  SystemSettings {
     uint16_t    EC;
     uint16_t    PH;                         /* R26 */
 
-    /* the below write able */
+    /* the below register is writable */
     uint16_t    towerID;
     uint16_t    date;
     uint16_t    timeLow;
     uint16_t    timeHigh;
     uint16_t    runningFlags;        /* automatic/manual */
-    uint16_t    towersEnabled;      /* bit 0 ~ bit 7 to mapping tower 1 ~ 8*/
-    uint16_t    valvaSwithTimer;    /* must less 300 sec*/
-    uint16_t    noFlowTimer;        /* must less 300 sec*/
+    uint16_t    towersEnabled;       /* bit 0 ~ bit 7 to mapping tower 1 ~ 8*/
+    uint16_t    valvaSwithTimer;     /* must less 300 sec*/
+    uint16_t    noWaterTimer;        /* must less 300 sec*/
     uint16_t    pumpCountDownTimer;
     uint16_t    tower1SettingTimer;
     uint16_t    tower2SettingTimer;
@@ -51,6 +51,9 @@ struct  SystemSettings {
     uint16_t    tower6SettingTimer;
     uint16_t    tower7SettingTimer;
     uint16_t    tower8SettingTimer;
+    uint16_t    triggerEC;
+    uint16_t    triggerPH;
+    uint16_t    cleaningTimer; /* 清洗等待 */
 };
 
 #endif /* End of _SYS_SETTINGS_H */

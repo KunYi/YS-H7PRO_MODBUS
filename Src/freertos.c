@@ -26,6 +26,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include "rtc.h"
 #include "SEGGER_RTT.h"
 /* USER CODE END Includes */
 
@@ -194,9 +195,29 @@ void StartDefaultTask(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+
+
+
 void basic1SecCallback(void *argument)
 {
-  static int count = 0;
-  SEGGER_RTT_printf(0, "1Sec Timer callback: %d \n", ++count);
+  static uint32_t count = 0;
+  static int64_t test = 0;
+  count++;
+
+  test++;
+
+  if ((count % 10) == 0) {
+    RTC_DateTypeDef sdate={0};
+    RTC_TimeTypeDef stime={0};
+    /*
+      don't change GetTime & GetDate sequence
+      STM32 need keep the operation order for RTC
+    */
+    HAL_RTC_GetTime(&hrtc, &stime, RTC_FORMAT_BIN);
+    HAL_RTC_GetDate(&hrtc, &sdate, RTC_FORMAT_BIN);
+    SEGGER_RTT_printf(0, "current date:time %0.2d/%0.2d/%0.4d, ", sdate.Month, sdate.Date, sdate.Year + 2000);
+    SEGGER_RTT_printf(0, "%0.2d:%0.2d:%0.2d \n", stime.Hours, stime.Minutes, stime.Seconds);
+  }
+
 }
 /* USER CODE END Application */

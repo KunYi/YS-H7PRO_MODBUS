@@ -12,6 +12,7 @@
 #include "Modbus.h"
 #include "sysSettings.h"
 #include "SEGGER_RTT.h"
+#include "defaultConfig.h"
 
 static modbusHandler_t MBSettingsH;
 static uint16_t        SysSettings[(sizeof(struct SystemSettings)/sizeof(uint16_t))];

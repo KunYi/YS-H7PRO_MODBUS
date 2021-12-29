@@ -10,6 +10,7 @@
 #include "Modbus.h"
 #include "sysSettings.h"
 #include "SEGGER_RTT.h"
+#include "defaultConfig.h"
 
 void InitMbIoT(void);
 void StartMbIoTTask(void *argument);

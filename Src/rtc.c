@@ -21,7 +21,7 @@
 #include "rtc.h"
 
 /* USER CODE BEGIN 0 */
-
+#include "defaultConfig.h"
 /* USER CODE END 0 */
 
 RTC_HandleTypeDef hrtc;
@@ -61,19 +61,19 @@ void MX_RTC_Init(void)
 
   /** Initialize RTC and set the Time and Date
   */
-  sTime.Hours = 0x0;
-  sTime.Minutes = 0x0;
-  sTime.Seconds = 0x0;
+  sTime.Hours = DEFAULT_TIME_HOUR;
+  sTime.Minutes = DEFAULT_TIME_MINUTE;
+  sTime.Seconds = DEFAULT_TIME_SECOND;
   sTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
   sTime.StoreOperation = RTC_STOREOPERATION_RESET;
   if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
   {
     Error_Handler();
   }
-  sDate.WeekDay = RTC_WEEKDAY_MONDAY;
-  sDate.Month = RTC_MONTH_JANUARY;
-  sDate.Date = 0x1;
-  sDate.Year = 0x0;
+  sDate.WeekDay = DEFAULT_WEEKDAY;
+  sDate.Month = DEFAULT_DATE_MONTH;
+  sDate.Date = DEFAULT_DATE_DAY;
+  sDate.Year = DEFAULT_DATE_YEAR;
 
   if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD) != HAL_OK)
   {

@@ -46,12 +46,7 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-#define MODBUS_SETTINGS_UART   huart3 /* USB to COM, for settings*/
-#define MODBUS_MASTER_UART     huart4 /* RS485 Port 1 for Sensor*/
-#define MODBUS_IOT_UART        huart8 /* RS485 Port 2, PE0, PE1 UART8 for NB-IOT*/
 
-#define MODBUS_SLAVE_ID	       (1)
-#define TOWER_ID               (12345)
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
