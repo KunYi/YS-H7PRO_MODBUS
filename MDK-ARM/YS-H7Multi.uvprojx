@@ -414,6 +414,11 @@
               <FilePath>../Src/main.c</FilePath>
             </File>
             <File>
+              <FileName>mytime.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\mytime.c</FilePath>
+            </File>
+            <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/gpio.c</FilePath>

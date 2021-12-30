@@ -35,8 +35,8 @@ struct  SystemSettings {
 
     /* the below register is writable */
     uint16_t    towerID;
-    uint16_t    date;
-    uint16_t    timeLow;
+    uint16_t    myTimeLow;
+    uint16_t    myTimeHigh;
     uint16_t    timeHigh;
     uint16_t    runningFlags;        /* automatic/manual */
     uint16_t    towersEnabled;       /* bit 0 ~ bit 7 to mapping tower 1 ~ 8*/
