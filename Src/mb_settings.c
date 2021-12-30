@@ -13,6 +13,9 @@
 #include "sysSettings.h"
 #include "SEGGER_RTT.h"
 #include "defaultConfig.h"
+#include "rtc.h"
+#include "mytime.h"
+
 
 static modbusHandler_t MBSettingsH;
 static uint16_t        SysSettings[(sizeof(struct SystemSettings)/sizeof(uint16_t))];
@@ -34,10 +37,35 @@ void StartMbSettingsTask(void *argument)
   }
 }
 
+static void syncRTCTime(const int32_t val) {
+  struct MYTIME mytime={0};
+  epoch_to_datetime(val, &mytime);
+  SEGGER_RTT_printf(0, "to set RTC %0.2d/%0.2d/%0.4d, %0.2d:%0.2d:%0.2d\n",
+                        mytime.month, mytime.day, mytime.year,
+                        mytime.hour, mytime.minute, mytime.second );
+  RTC_TimeTypeDef sTime = { .Hours = mytime.hour,
+                            .Minutes = mytime.minute,
+                            .Seconds =  mytime.second,
+                            .DayLightSaving = RTC_DAYLIGHTSAVING_NONE,
+                            .StoreOperation = RTC_STOREOPERATION_RESET
+                          };
+  HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+  RTC_DateTypeDef sDate = { .Month = mytime.month,
+                            .Date = mytime.day,
+                            .Year = (mytime.year - 2000),
+                            .WeekDay = RTC_WEEKDAY_MONDAY
+                          };
+        HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
+}
 static void MbSettingsProc(void) {
     // HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, (GPIO_PinState)(MBSettingsH.u8coils[0] & (1<<0)));
     // HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, (GPIO_PinState)(MBSettingsH.u8coils[0] & (1<<1)));
-    //printf("reg 0:0x%04X, reg 1:0x%04X\r\n", ModbusSlaveH.u16regs[0], ModbusSlaveH.u16regs[1]);
+
+    int32_t val = (MBSettingsH.u16regs[28] + MBSettingsH.u16regs[29] * 65536);
+    if (val != 0) {
+        syncRTCTime(val);
+    }
+
     memcpy(ModusSlaveDataBuffer, pSysSettings, sizeof(SysSettings));
 }
 
