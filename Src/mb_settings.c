@@ -15,6 +15,7 @@
 #include "defaultConfig.h"
 #include "rtc.h"
 #include "mytime.h"
+#include "debug.h"
 
 
 static modbusHandler_t MBSettingsH;
@@ -40,9 +41,11 @@ void StartMbSettingsTask(void *argument)
 static void syncRTCTime(const int32_t val) {
   struct MYTIME mytime={0};
   epoch_to_datetime(val, &mytime);
-  SEGGER_RTT_printf(0, "to set RTC %0.2d/%0.2d/%0.4d, %0.2d:%0.2d:%0.2d\n",
-                        mytime.month, mytime.day, mytime.year,
-                        mytime.hour, mytime.minute, mytime.second );
+
+  DEBUG_PRINTF("to set RTC %0.2d/%0.2d/%0.4d, %0.2d:%0.2d:%0.2d\n",
+                mytime.month, mytime.day, mytime.year,
+                mytime.hour, mytime.minute, mytime.second );
+
   RTC_TimeTypeDef sTime = { .Hours = mytime.hour,
                             .Minutes = mytime.minute,
                             .Seconds =  mytime.second,
@@ -50,12 +53,13 @@ static void syncRTCTime(const int32_t val) {
                             .StoreOperation = RTC_STOREOPERATION_RESET
                           };
   HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+
   RTC_DateTypeDef sDate = { .Month = mytime.month,
                             .Date = mytime.day,
                             .Year = (mytime.year - 2000),
                             .WeekDay = RTC_WEEKDAY_MONDAY
                           };
-        HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
+  HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 }
 static void MbSettingsProc(void) {
     // HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, (GPIO_PinState)(MBSettingsH.u8coils[0] & (1<<0)));
