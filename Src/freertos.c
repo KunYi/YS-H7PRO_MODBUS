@@ -29,6 +29,7 @@
 #include "rtc.h"
 #include "SEGGER_RTT.h"
 #include "mytime.h"
+#include "sysSettings.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -198,6 +199,7 @@ void StartDefaultTask(void *argument)
 /* USER CODE BEGIN Application */
 
 
+extern struct SystemSettings*  pSysSettings;
 
 void basic1SecCallback(void *argument)
 {
@@ -214,6 +216,17 @@ void basic1SecCallback(void *argument)
     */
     HAL_RTC_GetTime(&hrtc, &stime, RTC_FORMAT_BIN);
     HAL_RTC_GetDate(&hrtc, &sdate, RTC_FORMAT_BIN);
+    struct MYTIME temp = {
+                           .year = sdate.Year + 2000,
+                           .month = sdate.Month,
+                           .day = sdate.Date,
+                           .hour = stime.Hours,
+                           .minute = stime.Minutes,
+                           .second = stime.Seconds
+                          };
+    uint32_t epoch = datetime_since_epoch(&temp);
+    pSysSettings->myTimeLow = (uint16_t)(epoch & 0xFFFF);
+    pSysSettings->myTimeHigh = (uint16_t)(epoch >> 16);
     SEGGER_RTT_printf(0, "current date:time %0.2d/%0.2d/%0.4d, ", sdate.Month, sdate.Date, sdate.Year + 2000);
     SEGGER_RTT_printf(0, "%0.2d:%0.2d:%0.2d \n", stime.Hours, stime.Minutes, stime.Seconds);
     #if 0
