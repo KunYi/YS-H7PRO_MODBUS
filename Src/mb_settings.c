@@ -19,9 +19,10 @@
 
 
 static modbusHandler_t MBSettingsH;
-static uint16_t        SysSettings[(sizeof(struct SystemSettings)/sizeof(uint16_t))];
 static uint16_t        ModusSlaveDataBuffer[(sizeof(struct SystemSettings)/sizeof(uint16_t))];
-static struct SystemSettings*  pSysSettings=(struct SystemSettings*)SysSettings;
+static uint16_t        SysSettings[(sizeof(struct SystemSettings)/sizeof(uint16_t))];
+struct SystemSettings*  pSysSettings=(struct SystemSettings*)SysSettings;
+
 
 void InitMbSettings(void);
 void StartMbSettingsTask(void *argument);
@@ -61,20 +62,83 @@ static void syncRTCTime(const int32_t val) {
                           };
   HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 }
+
+static void checkAndUpdateTowerID(void) {
+  if (MBSettingsH.u16regs[R00_TOWER_ID] != SysSettings[R00_TOWER_ID]) {
+    SysSettings[R00_TOWER_ID] = MBSettingsH.u16regs[R00_TOWER_ID];
+    // update ID
+  }
+}
+
+static void checkAndUpdateTowerMask(void) {
+  if (MBSettingsH.u16regs[R31_TOWER_MASK] != SysSettings[R31_TOWER_MASK]) {
+    SysSettings[R31_TOWER_MASK] = MBSettingsH.u16regs[R31_TOWER_MASK];
+  }
+}
+
+static void checkAndUpdateSysTime(void) {
+  uint32_t valNew = MBSettingsH.u16regs[R47_SYS_TIME_WH] * 65536 +  MBSettingsH.u16regs[R46_SYS_TIME_WL];
+
+  if (valNew != 0) {
+    SysSettings[R28_SYS_TIME_RL] = MBSettingsH.u16regs[R46_SYS_TIME_WL];
+    SysSettings[R29_SYS_TIME_RH] = MBSettingsH.u16regs[R47_SYS_TIME_WH];
+    syncRTCTime(valNew);
+  }
+}
+
+static void checkAndUpdateManualOp(void) {
+  if (MBSettingsH.u16regs[R48_MANUAL_CMD] == 0)
+    return;
+
+  const uint8_t port = MBSettingsH.u16regs[R48_MANUAL_CMD] >> 8;
+  const uint8_t value = MBSettingsH.u16regs[R48_MANUAL_CMD] & 0xFF;
+  DEBUG_PRINTF("set Y%d: %d\n", port-1, value);
+  switch (port) {
+  case 1:
+      break;
+  case 2:
+      break;
+  case 3:
+      break;
+  case 4:
+      break;
+  case 5:
+      break;
+  case 6:
+      break;
+  case 7:
+      break;
+  case 8:
+      break;
+  case 9:
+      break;
+  case 10:
+      break;
+  case 11:
+      break;
+  case 12:
+      break;
+  }
+}
+
 static void MbSettingsProc(void) {
-    // HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, (GPIO_PinState)(MBSettingsH.u8coils[0] & (1<<0)));
-    // HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, (GPIO_PinState)(MBSettingsH.u8coils[0] & (1<<1)));
+  checkAndUpdateTowerID();
+  checkAndUpdateTowerMask();
+  checkAndUpdateSysTime();
+  checkAndUpdateManualOp();
 
-    int32_t val = (MBSettingsH.u16regs[28] + MBSettingsH.u16regs[29] * 65536);
-    if (val != 0) {
-        syncRTCTime(val);
-    }
+  memcpy(ModusSlaveDataBuffer, pSysSettings, sizeof(SysSettings));
+}
 
-    memcpy(ModusSlaveDataBuffer, pSysSettings, sizeof(SysSettings));
+static void defaultValue(void)
+{
+  memset(&SysSettings, 0, sizeof(SysSettings));
+  SysSettings[R00_TOWER_ID] = TOWER_ID;
+	SysSettings[R31_TOWER_MASK] = 0x0F;
 }
 
 void InitMbSettings(void) {
-  memset(&SysSettings, 0, sizeof(SysSettings));
+  defaultValue();
   memcpy(ModusSlaveDataBuffer, pSysSettings, sizeof(SysSettings));
   /* Modbus Slave initialization */
   MBSettingsH.uModbusType = MB_SLAVE;
