@@ -10,13 +10,13 @@
 #define TOWER_ID               (12345)
 
 /* BCD format */
-/* default 12/29/2021, 19:30:30 */
+/* default 01/20/2022, 19:30:30 */
 #define DEFAULT_TIME_HOUR      (0x19)
 #define DEFAULT_TIME_MINUTE    (0x30)
 #define DEFAULT_TIME_SECOND    (0x30)
-#define DEFAULT_WEEKDAY        (RTC_WEEKDAY_WEDNESDAY)
-#define DEFAULT_DATE_YEAR      (0x21)
-#define DEFAULT_DATE_MONTH     (RTC_MONTH_DECEMBER)
-#define DEFAULT_DATE_DAY       (0x29)
+#define DEFAULT_WEEKDAY        (RTC_WEEKDAY_THURSDAY)
+#define DEFAULT_DATE_YEAR      (0x22)
+#define DEFAULT_DATE_MONTH     (RTC_MONTH_JANUARY)
+#define DEFAULT_DATE_DAY       (0x20)
 
 #endif /* end of __DEFAULT_CONF_H */
