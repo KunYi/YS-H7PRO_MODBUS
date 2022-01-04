@@ -32,14 +32,23 @@ enum OffsetMBSetting {
     R24_AVG_CURRENT = 24,
     R25_INST_POWER = 25,
     R26_CUM_POWER = 26,
-    R27_DIGITAL_INPUT = 27,
-    R28_SYS_TIME_RL = 28,
-    R29_SYS_TIME_RH = 29,
-    R30_MODE_STATUS = 30,
-    R31_TOWER_MASK = 31,
-    R46_SYS_TIME_WL = 46,
-    R47_SYS_TIME_WH = 47,
-    R48_MANUAL_CMD = 48,
+    R27_OP_TIMER = 27,
+    R28_DIGITAL_INPUT = 28,
+    R29_SYS_TIME_RL = 29,
+    R30_SYS_TIME_RH = 30,
+    R31_MODE_STATUS = 31,
+    R32_TOWER_MASK = 32,
+    R36_TOWER1_TIMER = 36,
+    R37_TOWER2_TIMER = 37,
+    R38_TOWER3_TIMER = 38,
+    R39_TOWER4_TIMER = 39,
+    R40_TOWER5_TIMER = 40,
+    R41_TOWER6_TIMER = 41,
+    R42_TOWER7_TIMER = 42,
+    R43_TOWER8_TIMER = 43,
+    R47_SYS_TIME_WL = 47,
+    R48_SYS_TIME_WH = 48,
+    R49_MANUAL_CMD = 49,
 };
 
 enum RUN_MODE {
@@ -75,30 +84,30 @@ struct  SystemSettings {
     uint16_t    averageCurrent;         /* R24, Read only */
     uint16_t    instantaneousPower;     /* R25, Read only */
     uint16_t    cumulativePower;        /* R26, Read only */
-    uint16_t    towerRunningTimer;      /* R26, Read only */
-    uint16_t    digitalInput;           /* R27, Read only */
-    uint16_t    myTimeLow;              /* R28, Read only */
-    uint16_t    myTimeHigh;             /* R29, Read only */
+    uint16_t    towerRunningTimer;      /* R27, Read only */
+    uint16_t    digitalInput;           /* R28, Read only */
+    uint16_t    myTimeLow;              /* R29, Read only */
+    uint16_t    myTimeHigh;             /* R30, Read only */
     /* the below register is writable */
-    uint16_t    runningFlags;           /* R30, automatic/manual */
-    uint16_t    towersEnabled;          /* R31, bit 0 ~ bit 7 to mapping tower 1 ~ 8*/
-    uint16_t    valvaSwithTimer;        /* R32, must less 300 sec*/
-    uint16_t    noWaterTimer;           /* R33, must less 300 sec*/
-    uint16_t    pumpCountDownTimer;     /* R34 */
-    uint16_t    tower1SettingTimer;     /* R35 */
-    uint16_t    tower2SettingTimer;     /* R36 */
-    uint16_t    tower3SettingTimer;     /* R37 */
-    uint16_t    tower4SettingTimer;     /* R38 */
-    uint16_t    tower5SettingTimer;     /* R39 */
-    uint16_t    tower6SettingTimer;     /* R40 */
-    uint16_t    tower7SettingTimer;     /* R41 */
-    uint16_t    tower8SettingTimer;     /* R42 */
-    uint16_t    triggerEC;              /* R43 */
-    uint16_t    triggerPH;              /* R44 */
-    uint16_t    cleaningTimer;          /* R45 */
-    uint16_t    myTimeLowW;             /* R46, Write only */
-    uint16_t    myTimeHighW;            /* R47, Write only */
-    uint16_t    manualCmd;              /* R48, Write only */
+    uint16_t    runningFlags;           /* R31, automatic/manual */
+    uint16_t    towersEnabled;          /* R32, bit 0 ~ bit 7 to mapping tower 1 ~ 8*/
+    uint16_t    valvaSwithTimer;        /* R33, must less 300 sec*/
+    uint16_t    noWaterTimer;           /* R34, must less 300 sec*/
+    uint16_t    pumpCountDownTimer;     /* R35 */
+    uint16_t    tower1SettingTimer;     /* R36 */
+    uint16_t    tower2SettingTimer;     /* R37 */
+    uint16_t    tower3SettingTimer;     /* R38 */
+    uint16_t    tower4SettingTimer;     /* R39 */
+    uint16_t    tower5SettingTimer;     /* R40 */
+    uint16_t    tower6SettingTimer;     /* R41 */
+    uint16_t    tower7SettingTimer;     /* R42 */
+    uint16_t    tower8SettingTimer;     /* R43 */
+    uint16_t    triggerEC;              /* R44 */
+    uint16_t    triggerPH;              /* R45 */
+    uint16_t    cleaningTimer;          /* R46 */
+    uint16_t    myTimeLowW;             /* R47, Write only */
+    uint16_t    myTimeHighW;            /* R48, Write only */
+    uint16_t    manualCmd;              /* R49, Write only */
 };
 
 #endif /* End of _SYS_SETTINGS_H */

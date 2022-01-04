@@ -71,27 +71,27 @@ static void checkAndUpdateTowerID(void) {
 }
 
 static void checkAndUpdateTowerMask(void) {
-  if (MBSettingsH.u16regs[R31_TOWER_MASK] != SysSettings[R31_TOWER_MASK]) {
-    SysSettings[R31_TOWER_MASK] = MBSettingsH.u16regs[R31_TOWER_MASK];
+  if (MBSettingsH.u16regs[R32_TOWER_MASK] != SysSettings[R32_TOWER_MASK]) {
+    SysSettings[R32_TOWER_MASK] = MBSettingsH.u16regs[R32_TOWER_MASK];
   }
 }
 
 static void checkAndUpdateSysTime(void) {
-  uint32_t valNew = MBSettingsH.u16regs[R47_SYS_TIME_WH] * 65536 +  MBSettingsH.u16regs[R46_SYS_TIME_WL];
+  uint32_t valNew = MBSettingsH.u16regs[R48_SYS_TIME_WH] * 65536 +  MBSettingsH.u16regs[R47_SYS_TIME_WL];
 
   if (valNew != 0) {
-    SysSettings[R28_SYS_TIME_RL] = MBSettingsH.u16regs[R46_SYS_TIME_WL];
-    SysSettings[R29_SYS_TIME_RH] = MBSettingsH.u16regs[R47_SYS_TIME_WH];
+    SysSettings[R29_SYS_TIME_RL] = MBSettingsH.u16regs[R47_SYS_TIME_WL];
+    SysSettings[R30_SYS_TIME_RH] = MBSettingsH.u16regs[R48_SYS_TIME_WH];
     syncRTCTime(valNew);
   }
 }
 
 static void checkAndUpdateManualOp(void) {
-  if (MBSettingsH.u16regs[R48_MANUAL_CMD] == 0)
+  if (MBSettingsH.u16regs[R49_MANUAL_CMD] == 0)
     return;
 
-  const uint8_t port = MBSettingsH.u16regs[R48_MANUAL_CMD] >> 8;
-  const uint8_t value = MBSettingsH.u16regs[R48_MANUAL_CMD] & 0xFF;
+  const uint8_t port = MBSettingsH.u16regs[R49_MANUAL_CMD] >> 8;
+  const uint8_t value = MBSettingsH.u16regs[R49_MANUAL_CMD] & 0xFF;
   DEBUG_PRINTF("set Y%d: %d\n", port-1, value);
   switch (port) {
   case 1:
@@ -134,7 +134,7 @@ static void defaultValue(void)
 {
   memset(&SysSettings, 0, sizeof(SysSettings));
   SysSettings[R00_TOWER_ID] = TOWER_ID;
-	SysSettings[R31_TOWER_MASK] = 0x0F;
+	SysSettings[R32_TOWER_MASK] = 0x0F;
 }
 
 void InitMbSettings(void) {
