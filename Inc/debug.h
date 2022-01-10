@@ -2,6 +2,7 @@
 #ifndef __DEBUG_H_
 #define __DEBUG_H_
 
+#include "SEGGER_RTT.h"
 #ifndef DEBUG_ENABLED
 #define DEBUG_ENABLED 0 /* default disable, please to setting in project or makefile */
 #endif

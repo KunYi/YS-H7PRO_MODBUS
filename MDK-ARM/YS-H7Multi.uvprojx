@@ -504,6 +504,11 @@
               <FileType>1</FileType>
               <FilePath>../Src/stm32h7xx_hal_timebase_tim.c</FilePath>
             </File>
+            <File>
+              <FileName>cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\cfg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

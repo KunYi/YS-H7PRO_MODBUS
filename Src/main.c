@@ -26,7 +26,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
-#include "SEGGER_RTT.h"
+#include "cfg.h"
+#include "debug.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,6 +47,15 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+/*
+  for MDK-ARM
+  GCC/IAR need definition a section in linkscript
+*/
+#define CONST_FW_INFO_BASE (0x801FF00)
+const char FW_PROJ[] __attribute__((at(CONST_FW_INFO_BASE))) = "TAIRONE";
+const uint8_t FW_VER[] __attribute__((at((CONST_FW_INFO_BASE+0x10)))) = { 1, 0, 0, 0};
+const char FW_BUILDDATE[16] __attribute__((at((CONST_FW_INFO_BASE+0x18)))) = __DATE__;
+struct CFG sysCfg;
 
 /* USER CODE END PV */
 
@@ -101,8 +111,16 @@ int main(void)
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
 
-	printf(RTT_CTRL_CLEAR RTT_CTRL_RESET  "complete STM32H743 init\n");
-	SEGGER_RTT_printf(0, "STM32H743 Project start - RTT\n");
+  printf(RTT_CTRL_CLEAR RTT_CTRL_RESET  "complete STM32H743 init\n");
+  DEBUG_PRINTF("STM32H743 Project start - RTT\n");
+  readCFG(&sysCfg);
+  if (sysCfg.magicMark != CFG_MAGIC) {
+      saveInitCFG();
+      readCFG(&sysCfg);
+      if (sysCfg.magicMark != CFG_MAGIC) {
+        DEBUG_PRINTF("CFG init failed\n");
+      }
+  }
   /* USER CODE END 2 */
 
   /* Init scheduler */

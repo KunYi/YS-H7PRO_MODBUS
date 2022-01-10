@@ -26,35 +26,52 @@ enum OffsetMBSetting {
     R18_TEMP7_OUT = 18,
     R19_TEMP8_IN = 19,
     R20_TEMP8_OUT = 20,
-    R21_DRAIN_TIME = 21,
+    R21_TOTAL_DRAIN_TIME = 21,
     R22_OP_TOWER_NUM = 22,
-    R23_AVG_VOLTAGE = 23,
-    R24_AVG_CURRENT = 24,
-    R25_INST_POWER = 25,
-    R26_CUM_POWER = 26,
-    R27_OP_TIMER = 27,
-    R28_DIGITAL_INPUT = 28,
-    R29_SYS_TIME_RL = 29,
-    R30_SYS_TIME_RH = 30,
-    R31_MODE_STATUS = 31,
-    R32_TOWER_MASK = 32,
-    R36_TOWER1_TIMER = 36,
-    R37_TOWER2_TIMER = 37,
-    R38_TOWER3_TIMER = 38,
-    R39_TOWER4_TIMER = 39,
-    R40_TOWER5_TIMER = 40,
-    R41_TOWER6_TIMER = 41,
-    R42_TOWER7_TIMER = 42,
-    R43_TOWER8_TIMER = 43,
-    R47_SYS_TIME_WL = 47,
-    R48_SYS_TIME_WH = 48,
-    R49_MANUAL_CMD = 49,
+    R23_OP_MINUTE = 23,
+    R24_DIGITAL_INPUT = 24,
+    R25_NOWATER = 25,
+    R26_COOLDOWN = 26,
+    R27_DRAIN_TIME = 27,
+    R28_CLEANING_COOLDOWN = 28,
+    R29_VALVE_SWITCH = 29,
+    R30_PUMP_NOWATER = 30,
+    R31_PUMP_COOLDOWN = 31,
+    R32_SOURCE_FLOW = 32,
+    R33_NBIOT_PROC = 33,
+    R34_SYS_TIME_RL = 34,
+    R35_SYS_TIME_RH = 35,
+    R36_RUN_MODE = 36,
+    R37_TOWER_ENABLED = 37,
+    R38_TOWER1_TIMER = 38,
+    R39_TOWER2_TIMER = 39,
+    R40_TOWER3_TIMER = 40,
+    R41_TOWER4_TIMER = 41,
+    R42_TOWER5_TIMER = 42,
+    R43_TOWER6_TIMER = 43,
+    R44_TOWER7_TIMER = 44,
+    R45_TOWER8_TIMER = 45,
+    R46_PUMP_NOWATER_TIME = 46,
+    R47_PUMP_COOLDOWN_TIME = 47,
+    R48_EC_TRIGGER = 48,
+    R49_PH_TRIGGER = 49,
+    R50_CLEANING_TIME = 50,
+    R51_CLEANING_COOLDOWN_TIME = 51,
+    R52_SOURCE_FLOW_TIME = 52,
+    R53_NBIOT_TIME = 53,
+    R54_NBIOT_POWEROFF = 54,
+    R55_SYS_TIME_WL = 55,
+    R56_SYS_TIME_WH = 56,
+    R57_MANUAL_CMD = 57,
 };
 
 enum RUN_MODE {
     MODE_MANUAL = 0,
     MODE_RUNNING = 0xEA55,
 };
+
+#define DI_MASK_FLOW    (0x0001)
+#define DI_MASK_PUMP    (0x0002)
 
 struct  SystemSettings {
     uint16_t    towerID;                /* R00, Read only */
@@ -78,36 +95,44 @@ struct  SystemSettings {
     uint16_t    outTemp7;               /* R18, Read only */
     uint16_t    inTemp8;                /* R19, Read only */
     uint16_t    outTemp8;               /* R20, Read only */
-    uint16_t    drainTime;              /* R21, Read only, lessthen 30000 */
+    uint16_t    totalDrainTime;         /* R21, Read only, lessthen 30000, DO0  */
     uint16_t    operatingTowerNum;      /* R22, Read only */
-    uint16_t    averageVoltage;         /* R23, Read only */
-    uint16_t    averageCurrent;         /* R24, Read only */
-    uint16_t    instantaneousPower;     /* R25, Read only */
-    uint16_t    cumulativePower;        /* R26, Read only */
-    uint16_t    towerRunningTimer;      /* R27, Read only */
-    uint16_t    digitalInput;           /* R28, Read only */
-    uint16_t    myTimeLow;              /* R29, Read only */
-    uint16_t    myTimeHigh;             /* R30, Read only */
+    uint16_t    towerOpMinute;          /* R23, Read only */
+    uint16_t    digitalInput;           /* R24, Read only */
+    uint16_t    noWater;                /* R25, Read only */
+    uint16_t    coolDown;               /* R26, Read only */
+    uint16_t    drainTime;              /* R27, Read only */
+    uint16_t    cleaningCoolDown;       /* R28, Read only */
+    uint16_t    valveSwithTimer;        /* R29, must less 300 sec*/
+    uint16_t    pumpNoWater;            /* R30, must less 300 sec*/
+    uint16_t    pumpCoolDown;           /* R31, must less 6000 sec*/
+    uint16_t    sourceFlow;             /* R32, Read only */
+    uint16_t    nbIoTProc;              /* R33, Read only */
+    uint16_t    myTimeLow;              /* R34, Read only */
+    uint16_t    myTimeHigh;             /* R35, Read only */
     /* the below register is writable */
-    uint16_t    runningFlags;           /* R31, automatic/manual */
-    uint16_t    towersEnabled;          /* R32, bit 0 ~ bit 7 to mapping tower 1 ~ 8*/
-    uint16_t    valvaSwithTimer;        /* R33, must less 300 sec*/
-    uint16_t    noWaterTimer;           /* R34, must less 300 sec*/
-    uint16_t    pumpCountDownTimer;     /* R35 */
-    uint16_t    tower1SettingTimer;     /* R36 */
-    uint16_t    tower2SettingTimer;     /* R37 */
-    uint16_t    tower3SettingTimer;     /* R38 */
-    uint16_t    tower4SettingTimer;     /* R39 */
-    uint16_t    tower5SettingTimer;     /* R40 */
-    uint16_t    tower6SettingTimer;     /* R41 */
-    uint16_t    tower7SettingTimer;     /* R42 */
-    uint16_t    tower8SettingTimer;     /* R43 */
-    uint16_t    triggerEC;              /* R44 */
-    uint16_t    triggerPH;              /* R45 */
-    uint16_t    cleaningTimer;          /* R46 */
-    uint16_t    myTimeLowW;             /* R47, Write only */
-    uint16_t    myTimeHighW;            /* R48, Write only */
-    uint16_t    manualCmd;              /* R49, Write only */
+    uint16_t    runMode;                /* R36, automatic/manual */
+    uint16_t    towersEnabled;          /* R37, bit 0 ~ bit 7 to mapping tower 1 ~ 8*/
+    uint16_t    tower1SettingTimer;     /* R38 */
+    uint16_t    tower2SettingTimer;     /* R39 */
+    uint16_t    tower3SettingTimer;     /* R40 */
+    uint16_t    tower4SettingTimer;     /* R41 */
+    uint16_t    tower5SettingTimer;     /* R42 */
+    uint16_t    tower6SettingTimer;     /* R43 */
+    uint16_t    tower7SettingTimer;     /* R44 */
+    uint16_t    tower8SettingTimer;     /* R45 */
+    uint16_t    pumpNoWatrTime;         /* R46 */
+    uint16_t    pumpCoolDownTime;       /* R47 */
+    uint16_t    triggerEC;              /* R48 */
+    uint16_t    triggerPH;              /* R49 */
+    uint16_t    cleaningTime;           /* R50 */
+    uint16_t    cleaningCoolDownTime;   /* R51 */
+    uint16_t    sourceFlowTime;         /* R52 */
+    uint16_t    nbIoTProcTime;          /* R53 */
+    uint16_t    nbIoTPowerOff;          /* R54 */
+    uint16_t    myTimeLowW;             /* R55, Write only */
+    uint16_t    myTimeHighW;            /* R56, Write only */
+    uint16_t    manualCmd;              /* R57, Write only */
 };
 
 #endif /* End of _SYS_SETTINGS_H */
