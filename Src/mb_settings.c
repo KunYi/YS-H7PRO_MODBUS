@@ -15,13 +15,31 @@
 #include "defaultConfig.h"
 #include "rtc.h"
 #include "mytime.h"
+#include "cfg.h"
 #include "debug.h"
 
+
+enum SAVE_MAGIC_CMD {
+    SAVE_CMD_RESET  = 0x8012,
+    SAVE_CMD_MAGIC1 = 0xA321,
+    SAVE_CMD_MAGIC2 = 0xB456,
+};
+
+enum SAVE_STATUS_MACHINE {
+    SAVE_IDLE = 1,
+    SAVE_MAGIC1 = 2,
+    SAVE_MAGIC2 = 3,
+    SAVE_DONE = 4,
+};
+
+static enum SAVE_STATUS_MACHINE saveMachine;
+static int16_t saveCount = 0;
 
 static modbusHandler_t MBSettingsH;
 static uint16_t        ModusSlaveDataBuffer[(sizeof(struct SystemSettings)/sizeof(uint16_t))];
 static uint16_t        SysSettings[(sizeof(struct SystemSettings)/sizeof(uint16_t))];
 struct SystemSettings*  pSysSettings=(struct SystemSettings*)SysSettings;
+
 
 
 void InitMbSettings(void);
@@ -63,35 +81,22 @@ static void syncRTCTime(const int32_t val) {
   HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 }
 
-static void checkAndUpdateTowerID(void) {
-  if (MBSettingsH.u16regs[R00_TOWER_ID] != SysSettings[R00_TOWER_ID]) {
-    SysSettings[R00_TOWER_ID] = MBSettingsH.u16regs[R00_TOWER_ID];
-    // update ID
-  }
-}
-
-static void checkAndUpdateTowerMask(void) {
-  if (MBSettingsH.u16regs[R37_TOWER_ENABLED] != SysSettings[R37_TOWER_ENABLED]) {
-    SysSettings[R37_TOWER_ENABLED] = MBSettingsH.u16regs[R37_TOWER_ENABLED];
-  }
-}
-
 static void checkAndUpdateSysTime(void) {
-  uint32_t valNew = MBSettingsH.u16regs[R56_SYS_TIME_WH] * 65536 +  MBSettingsH.u16regs[R55_SYS_TIME_WL];
+  uint32_t valNew = MBSettingsH.u16regs[R57_SYS_TIME_WH] * 65536 +  MBSettingsH.u16regs[R56_SYS_TIME_WL];
 
   if (valNew != 0) {
-    SysSettings[R34_SYS_TIME_RL] = MBSettingsH.u16regs[R55_SYS_TIME_WL];
-    SysSettings[R35_SYS_TIME_RH] = MBSettingsH.u16regs[R56_SYS_TIME_WH];
+    pSysSettings->myTimeLow = MBSettingsH.u16regs[R56_SYS_TIME_WL];
+    pSysSettings->myTimeHigh = MBSettingsH.u16regs[R57_SYS_TIME_WH];
     syncRTCTime(valNew);
   }
 }
 
 static void checkAndUpdateManualOp(void) {
-  if (MBSettingsH.u16regs[R57_MANUAL_CMD] == 0)
+  if (MBSettingsH.u16regs[R58_MANUAL_CMD] == 0)
     return;
 
-  const uint8_t port = MBSettingsH.u16regs[R57_MANUAL_CMD] >> 8;
-  const uint8_t value = MBSettingsH.u16regs[R57_MANUAL_CMD] & 0xFF;
+  const uint8_t port = MBSettingsH.u16regs[R58_MANUAL_CMD] >> 8;
+  const uint8_t value = MBSettingsH.u16regs[R58_MANUAL_CMD] & 0xFF;
   DEBUG_PRINTF("set Y%d: %d\n", port-1, value);
   switch (port) {
   case 1:
@@ -118,30 +123,60 @@ static void checkAndUpdateManualOp(void) {
       break;
   case 12:
       break;
-  case 80:
+  }
+
+  switch(saveMachine) {
+  case SAVE_IDLE:
+      if (MBSettingsH.u16regs[R58_MANUAL_CMD] == SAVE_CMD_RESET) {
+        saveMachine = SAVE_MAGIC1;
+        saveCount = 0;
+      }
+      break;
+  case SAVE_MAGIC1:
+      if (MBSettingsH.u16regs[R58_MANUAL_CMD] == SAVE_CMD_MAGIC1)
+        saveMachine = SAVE_MAGIC2;
+      break;
+  case SAVE_MAGIC2:
+      if (MBSettingsH.u16regs[R58_MANUAL_CMD] == SAVE_CMD_MAGIC2) {
+        saveMachine = SAVE_DONE;
+        updateAndSaveCfg();
+      }
+  default:
+      if (MBSettingsH.u16regs[R58_MANUAL_CMD] == SAVE_CMD_RESET) {
+        saveMachine = SAVE_IDLE;
+      }
       break;
   }
 }
 
+static void updateSettings(void) {
+  if (MBSettingsH.u16regs[R00_TOWER_ID] != pSysSettings->towerID) {
+    DEBUG_PRINTF("Update TowerID: %d\n", MBSettingsH.u16regs[R00_TOWER_ID]);
+    pSysSettings->towerID = MBSettingsH.u16regs[R00_TOWER_ID];
+  }
+
+  if (MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME] != pSysSettings->valveSwitchTime)
+  {
+    DEBUG_PRINTF("Update ValeSwitch Time: %d\n", MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME]);
+    pSysSettings->valveSwitchTime = MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME];
+  }
+
+  for (int i = R36_RUN_MODE; i <= R55_FIELD_MASK; i++) {
+    if (SysSettings[i] != MBSettingsH.u16regs[i]) {
+      DEBUG_PRINTF("Update R%02d: value:%d(0x%04X)\n", i, MBSettingsH.u16regs[i], MBSettingsH.u16regs[i]);
+      SysSettings[i] = MBSettingsH.u16regs[i];
+    }
+  }
+}
+
 static void MbSettingsProc(void) {
-  checkAndUpdateTowerID();
-  checkAndUpdateTowerMask();
   checkAndUpdateSysTime();
   checkAndUpdateManualOp();
-
+  updateSettings();
   memcpy(ModusSlaveDataBuffer, pSysSettings, sizeof(SysSettings));
 }
 
-static void defaultValue(void)
-{
-  memset(&SysSettings, 0, sizeof(SysSettings));
-  SysSettings[R00_TOWER_ID] = TOWER_ID;
-	SysSettings[R37_TOWER_ENABLED] = 0x0F;
-  //SysSettings[]
-}
-
 void InitMbSettings(void) {
-  defaultValue();
   memcpy(ModusSlaveDataBuffer, pSysSettings, sizeof(SysSettings));
   /* Modbus Slave initialization */
   MBSettingsH.uModbusType = MB_SLAVE;
