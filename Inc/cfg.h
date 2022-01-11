@@ -9,19 +9,21 @@ struct CFG {
     uint32_t  magicMark;                            /* 4 */
     uint32_t  seqID;                                /* 8 */
     uint32_t  dirtyMark;                            /* 12 */
-    uint16_t  TowerID;                              /* 14 */
+    uint16_t  towerID;                              /* 14 */
     uint16_t  runMode;                              /* 16 */
-    uint16_t  TowerEnabled;                         /* 18 */
-    uint16_t  TowerTime[8];                         /* 34 */
-    uint16_t  pumpNoWaterTime;                      /* 36 */
-    uint16_t  pumpCoolDownTime;
-    uint16_t  triggerEC;
-    uint16_t  triggerPH;
-    uint16_t  cleaningTime;
-    uint16_t  cleaningCoolDownTime;
-    uint16_t  nbIoTProcTime;
-    uint16_t  nbIoTPowerOffTime;
-    uint16_t  sourceFlow;
+    uint16_t  towersEnabled;                        /* 18 */
+    uint16_t  towerTime[8];                         /* 34 */
+    uint16_t  valveSwitchTime;                      /* 36 */
+    uint16_t  pumpNoWaterTime;                      /* 38 */
+    uint16_t  pumpCoolDownTime;                     /* 40 */
+    uint16_t  triggerEC;                            /* 42 */
+    uint16_t  triggerPH;                            /* 44 */
+    uint16_t  cleaningTime;                         /* 46 */
+    uint16_t  cleaningCoolDownTime;                 /* 48 */
+    uint16_t  nbIoTProcTime;                        /* 50 */
+    uint16_t  nbIoTPowerOffTime;                    /* 52 */
+    uint16_t  sourceFlowTime;                       /* 54 */
+    uint16_t  fieldMask;                            /* 56 */
 };
 
 #define CFG_MAGIC   ((uint32_t)0xAB1255AA)
@@ -36,6 +38,8 @@ void readCFG(struct CFG* cfg);
 void saveCFG(struct CFG* cfg);
 void saveInitCFG(void);
 
+void checkAndLoadCfg(void);
+void updateAndSaveCfg(void);
 
 #define CFG_ADDRESS         ((uint32_t) 0x08020000)    /* SECTOR 1 */
 #endif /* end of file __CFG_H__ */

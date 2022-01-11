@@ -15,6 +15,8 @@
 #include "timers.h"
 #include "semphr.h"
 
+#include "debug.h"
+
 #if ENABLE_TCP == 1
 #include "api.h"
 #include "ip4_addr.h"
@@ -81,6 +83,9 @@ const osSemaphoreAttr_t ModBusSphr_attributes = {
 
 uint8_t numberHandlers = 0;
 
+void ModbusInitVar(void) {
+    numberHandlers = 0;
+}
 
 static void sendTxBuffer(modbusHandler_t *modH);
 static int16_t getRxBuffer(modbusHandler_t *modH);
@@ -298,6 +303,7 @@ void ModbusInit(modbusHandler_t * modH)
   }
   else
   {
+	  DEBUG_PRINTF ("Over Modbus Handler %d\n", numberHandlers);
 	  while(1); //error no more Modbus handlers supported
   }
 
@@ -431,7 +437,7 @@ void ModbusStartCDC(modbusHandler_t * modH)
 
     if (modH->uModbusType == MB_SLAVE &&  modH->u16regs == NULL )
     {
-    	while(1); //ERROR define the DATA pointer shared through Modbus
+        while(1); //ERROR define the DATA pointer shared through Modbus
     }
 
     modH->u8lastRec = modH->u8BufferSize = 0;

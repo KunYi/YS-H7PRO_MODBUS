@@ -238,6 +238,7 @@ enum
 extern modbusHandler_t *mHandlers[MAX_M_HANDLERS];
 
 // Function prototypes
+void ModbusInitVar(void);
 void ModbusInit(modbusHandler_t * modH);
 void ModbusStart(modbusHandler_t * modH);
 
