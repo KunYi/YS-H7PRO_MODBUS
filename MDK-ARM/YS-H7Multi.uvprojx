@@ -514,6 +514,16 @@
               <FileType>1</FileType>
               <FilePath>..\Src\swTimer.c</FilePath>
             </File>
+            <File>
+              <FileName>TowerOp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\TowerOp.c</FilePath>
+            </File>
+            <File>
+              <FileName>sysIO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\sysIO.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

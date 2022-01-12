@@ -29,6 +29,8 @@
 #include "cfg.h"
 #include "debug.h"
 #include "Modbus.h"
+#include "swTimer.h"
+#include "sysIO.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -110,6 +112,8 @@ int main(void)
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
   ModbusInitVar();
+  initSwTimer();
+  initSysIO();
   printf(RTT_CTRL_CLEAR RTT_CTRL_RESET  "complete STM32H743 init\n");
   DEBUG_PRINTF("STM32H743 Project start - RTT\n");
   checkAndLoadCfg();

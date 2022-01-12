@@ -17,6 +17,7 @@
 #include "mytime.h"
 #include "cfg.h"
 #include "debug.h"
+#include "sysIO.h"
 
 
 enum SAVE_MAGIC_CMD {
@@ -97,28 +98,40 @@ static void setManualOutput(const uint16_t cmd)
   DEBUG_PRINTF("set Y%d: %d\n", port-1, value);
   switch (port) {
   case 1:
+      DO0 = (value) ? 1 : 0;
       break;
   case 2:
+      DO1 = (value) ? 1 : 0;
       break;
   case 3:
+      DO2 = (value) ? 1 : 0;
       break;
   case 4:
+      DO3 = (value) ? 1 : 0;
       break;
   case 5:
+      DO4 = (value) ? 1 : 0;
       break;
   case 6:
+      DO5 = (value) ? 1 : 0;
       break;
   case 7:
+      DO6 = (value) ? 1 : 0;
       break;
   case 8:
+      DO7 = (value) ? 1 : 0;
       break;
   case 9:
+      DO8 = (value) ? 1 : 0;
       break;
   case 10:
+      DO9 = (value) ? 1 : 0;
       break;
   case 11:
+      DO10 = (value) ? 1 : 0;
       break;
   case 12:
+      DO11 = (value) ? 1 : 0;
       break;
   }
 }
@@ -158,6 +171,7 @@ static void MbSettingsProc(void) {
 }
 
 void InitMbSettings(void) {
+	pSysSettings=(struct SystemSettings*)SysSettings;
   memcpy(ModusSlaveDataBuffer, pSysSettings, sizeof(SysSettings));
   /* Modbus Slave initialization */
   MBSettingsH.uModbusType = MB_SLAVE;

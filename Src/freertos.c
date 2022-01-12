@@ -26,16 +26,17 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <string.h>
 #include "rtc.h"
-#include "SEGGER_RTT.h"
+#include "debug.h"
 #include "mytime.h"
 #include "swTimer.h"
-#include "sysSettings.h"
+#include "TowerOp.h"
+#include "sysIO.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -50,6 +51,14 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+extern struct SystemSettings*  pSysSettings;
+
+osThreadId_t dbgTaskHandle;
+const osThreadAttr_t dbgTask_attributes = {
+  .name = "dbgTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -91,7 +100,7 @@ const osTimerAttr_t basic1SecTimer_attributes = {
 extern void InitMbReadSensors(void);
 extern void InitMbSettings(void);
 extern void InitMbIoT(void);
-
+void StartDbgTask(void *argument);
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
@@ -168,7 +177,7 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-
+  dbgTaskHandle = osThreadNew(StartDbgTask, NULL, &dbgTask_attributes);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
@@ -190,12 +199,26 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    TowerProc();
+    osDelay(10);
   }
   /* USER CODE END StartDefaultTask */
 }
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+void StartDbgTask(void *argument)
+{
+  char cmd[80] = {0};
+  for (;;) {
+    if (SEGGER_RTT_Read(0, cmd, sizeof(cmd)) > 0) {
+      if (memcmp("dump", cmd, 4) == 0) {
+        DEBUG_PRINTF("DO:0x%04X\n", sysOut._out);
+      }
+      memset(cmd, 0, sizeof(cmd));
+    }
 
+    osDelay(100);
+  }
+}
 /* USER CODE END Application */
