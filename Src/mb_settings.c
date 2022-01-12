@@ -33,7 +33,7 @@ enum SAVE_STATUS_MACHINE {
 };
 
 static enum SAVE_STATUS_MACHINE saveMachine;
-static int16_t saveCount = 0;
+static uint32_t saveTick;
 
 static modbusHandler_t MBSettingsH;
 static uint16_t        ModusSlaveDataBuffer[(sizeof(struct SystemSettings)/sizeof(uint16_t))];
@@ -97,7 +97,8 @@ static void checkAndUpdateManualOp(void) {
 
   const uint8_t port = MBSettingsH.u16regs[R58_MANUAL_CMD] >> 8;
   const uint8_t value = MBSettingsH.u16regs[R58_MANUAL_CMD] & 0xFF;
-  DEBUG_PRINTF("set Y%d: %d\n", port-1, value);
+  if (port <= 13)
+    DEBUG_PRINTF("set Y%d: %d\n", port-1, value);
   switch (port) {
   case 1:
       break;
@@ -125,31 +126,47 @@ static void checkAndUpdateManualOp(void) {
       break;
   }
 
+#define SAVE_CMD_TIMEOUT  (1000)  /* 1000ms */
   switch(saveMachine) {
   case SAVE_IDLE:
       if (MBSettingsH.u16regs[R58_MANUAL_CMD] == SAVE_CMD_RESET) {
         saveMachine = SAVE_MAGIC1;
-        saveCount = 0;
+        saveTick = osKernelSysTick();
       }
       break;
   case SAVE_MAGIC1:
-      if (MBSettingsH.u16regs[R58_MANUAL_CMD] == SAVE_CMD_MAGIC1)
+      if (MBSettingsH.u16regs[R58_MANUAL_CMD] == SAVE_CMD_MAGIC1) {
         saveMachine = SAVE_MAGIC2;
+        saveTick = osKernelSysTick();
+      }
+      else {
+         if ((osKernelSysTick() - saveTick) > osKernelSysTickMicroSec(SAVE_CMD_TIMEOUT))
+            saveMachine = SAVE_IDLE;
+      }
       break;
   case SAVE_MAGIC2:
       if (MBSettingsH.u16regs[R58_MANUAL_CMD] == SAVE_CMD_MAGIC2) {
         saveMachine = SAVE_DONE;
+        saveTick = osKernelSysTick();
         updateAndSaveCfg();
+      }
+      else {
+         if ((osKernelSysTick() - saveTick) > osKernelSysTickMicroSec(SAVE_CMD_TIMEOUT))
+            saveMachine = SAVE_IDLE;
       }
   default:
       if (MBSettingsH.u16regs[R58_MANUAL_CMD] == SAVE_CMD_RESET) {
         saveMachine = SAVE_IDLE;
       }
+      else {
+         if ((osKernelSysTick() - saveTick) > osKernelSysTickMicroSec(SAVE_CMD_TIMEOUT))
+            saveMachine = SAVE_IDLE;
+      }
       break;
   }
 }
 
-static void updateSettings(void) {
+static void updateSettingsValue(void) {
   if (MBSettingsH.u16regs[R00_TOWER_ID] != pSysSettings->towerID) {
     DEBUG_PRINTF("Update TowerID: %d\n", MBSettingsH.u16regs[R00_TOWER_ID]);
     pSysSettings->towerID = MBSettingsH.u16regs[R00_TOWER_ID];
@@ -172,11 +189,12 @@ static void updateSettings(void) {
 static void MbSettingsProc(void) {
   checkAndUpdateSysTime();
   checkAndUpdateManualOp();
-  updateSettings();
+  updateSettingsValue();
   memcpy(ModusSlaveDataBuffer, pSysSettings, sizeof(SysSettings));
 }
 
 void InitMbSettings(void) {
+  saveTick = 0;
   memcpy(ModusSlaveDataBuffer, pSysSettings, sizeof(SysSettings));
   /* Modbus Slave initialization */
   MBSettingsH.uModbusType = MB_SLAVE;
