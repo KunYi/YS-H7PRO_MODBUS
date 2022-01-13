@@ -32,7 +32,7 @@ uint32_t dbgCount = 0;
 
 static int isEnabledTowerX(uint8_t num)
 {
-  return ((SysSettings[R37_TOWER_ENABLED] & 1<<num) != 0);
+  return ((SysSettings[R37_TOWER_ENABLED] & (1 << num)) != 0);
 }
 
 static int8_t getNextTower(uint8_t n) {
@@ -78,7 +78,7 @@ void TowerProc(void)
   case ENABLE_TOWER:
       DEBUG_PRINTF ("ENABLE_TOWER, TRANSTION to CHECK_PUMP_ON\n");
       towerState = CHECK_PUMP_ON;
-      sysSetOutput(towerData.currentTower + DO4);
+      sysTurnOnTower(towerData.currentTower);
       PUMP_ON_CTRL = TURN_ON_PUMP;
 
       SysSettings[R30_PUMP_NOWATER] = 0;
@@ -170,6 +170,8 @@ void TowerProc(void)
     if (SysSettings[R23_OP_MINUTE] >= SysSettings[R38_TOWER1_TIME + towerData.currentTower]) {
       towerState = SELECT_TOWER;
       DEBUG_PRINTF("Finish TOWER_RUNNING, TRASNSTION to SELECT_TOWER\n");
+      PUMP_ON_CTRL = TURN_OFF_PUMP;
+      sysTurnOffTower(towerData.currentTower);
     }
     break;
 

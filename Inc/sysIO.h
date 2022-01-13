@@ -94,6 +94,10 @@ extern union OUTPUT sysOut;
 #define PUMP_STATUS           DI1  /* pump active status */
 #define PUMP_ACTIVE_STATUS    (1)
 #define PUMP_INACTIVE_STATUS  (0)
+
+
 void initSysIO(void);
 void sysSetOutput(uint8_t num);
+void sysTurnOnTower(uint8_t num);
+void sysTurnOffTower(uint8_t num);
 #endif /* end of file, _SYS_IO_H_ */

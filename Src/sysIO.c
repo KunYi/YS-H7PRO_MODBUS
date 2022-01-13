@@ -10,5 +10,15 @@ void initSysIO() {
 
 void sysSetOutput(uint8_t num)
 {
-    sysOut._out = 1<<num;
+    sysOut._out |= (1 << num);
+}
+
+void sysTurnOnTower(uint8_t num)
+{
+    sysOut._out |= (1 << (num + NUM_DO4));
+}
+
+void sysTurnOffTower(uint8_t num)
+{
+    sysOut._out &= ~((uint16_t)(1 << (num + NUM_DO4)));
 }
