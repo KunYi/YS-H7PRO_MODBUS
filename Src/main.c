@@ -114,9 +114,18 @@ int main(void)
   ModbusInitVar();
   initSwTimer();
   initSysIO();
-  printf(RTT_CTRL_CLEAR RTT_CTRL_RESET  "complete STM32H743 init with GCC\n");
-  DEBUG_PRINTF("STM32H743 Project start - RTT\n");
   checkAndLoadCfg();
+
+  DEBUG_PRINTF(RTT_CTRL_CLEAR RTT_CTRL_RESET);
+  DEBUG_PRINTF("complete STM32H743 init with ");
+  #if defined ( __CC_ARM )
+  DEBUG_PRINTF("KEIL/ARM\n");
+  #elif defined ( __GNUC__ )
+  DEBUG_PRINTF("GCC\n");
+  #else
+  DEBUG_PRINTF("Unknow toolchain\n");
+  #endif
+  DEBUG_PRINTF("STM32H743 Project start - RTT\n");
 
   /* USER CODE END 2 */
 
@@ -257,4 +266,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-

@@ -19,4 +19,11 @@
 #define DEFAULT_DATE_MONTH     (RTC_MONTH_JANUARY)
 #define DEFAULT_DATE_DAY       (0x20)
 
+/* sensor's slave ID */
+#define SENSOR_EC              (9)
+#define SENSOR_PH              (8)
+#define SENSOR_TEMP1           (3)
+#define SENSOR_TEMP2           (4)
+
+#define MB_DIO                 (20)
 #endif /* end of __DEFAULT_CONF_H */

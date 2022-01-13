@@ -12,17 +12,8 @@
 #include "Modbus.h"
 #include "sysStatus.h"
 #include "sysSettings.h"
-#include "SEGGER_RTT.h"
+#include "debug.h"
 #include "defaultConfig.h"
-
-/* sensor's slave ID */
-#define SENSOR_EC              (9)
-#define SENSOR_PH              (8)
-#define SENSOR_TEMP1           (3)
-#define SENSOR_TEMP2           (4)
-
-#define MB_DIO                 (20)
-
 
 modbusHandler_t ModbusMasterH;
 uint8_t         ModbusSlaveCoilBuffer[10];
@@ -61,10 +52,10 @@ static void MbReadSensorsProc(void) {
   u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
   if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
     // error handler
-    SEGGER_RTT_printf(0, RTT_CTRL_TEXT_BRIGHT_RED "read EC failed\r\n");
-    SEGGER_RTT_printf(0, RTT_CTRL_RESET);
+    INFO_PRINTF(RTT_CTRL_TEXT_BRIGHT_RED "read EC failed\r\n");
+    INFO_PRINTF(RTT_CTRL_RESET);
   } else {
-    SEGGER_RTT_printf(0, "read EC:0x%04X(%d)\r\n", u16EC, u16EC);
+    DEBUG_PRINTF("read EC:0x%04X(%d)\r\n", u16EC, u16EC);
     pSysStatus->EC = u16EC;
   }
   osDelay(1);
@@ -78,10 +69,10 @@ static void MbReadSensorsProc(void) {
   u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
   if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
     // error handler
-    SEGGER_RTT_printf(0, RTT_CTRL_TEXT_BRIGHT_RED "read PH failed\r\n");
-    SEGGER_RTT_printf(0, RTT_CTRL_RESET);
+    INFO_PRINTF(RTT_CTRL_TEXT_BRIGHT_RED "read PH failed\r\n");
+    INFO_PRINTF(RTT_CTRL_RESET);
   } else {
-    SEGGER_RTT_printf(0, "read PH:0x%04X(%d)\r\n", u16PH, u16PH);
+    DEBUG_PRINTF("read PH:0x%04X(%d)\r\n", u16PH, u16PH);
     pSysStatus->PH = u16PH;
   }
   osDelay(1);
@@ -95,10 +86,10 @@ static void MbReadSensorsProc(void) {
   u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
   if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
     // error handler
-    SEGGER_RTT_printf(0, RTT_CTRL_TEXT_BRIGHT_RED "read temperature failed\r\n");
-    SEGGER_RTT_printf(0, RTT_CTRL_RESET);
+    INFO_PRINTF(RTT_CTRL_TEXT_BRIGHT_RED "read temperature failed\r\n");
+    INFO_PRINTF(RTT_CTRL_RESET);
   } else {
-    SEGGER_RTT_printf(0, "read Temp1 ch0:%d ch1:%d ch2:%d ch3:%d\r\n",
+    DEBUG_PRINTF("read Temp1 ch0:%d ch1:%d ch2:%d ch3:%d\r\n",
     u16Temp1Array[0], u16Temp1Array[1], u16Temp1Array[2], u16Temp1Array[3]);
     pSysStatus->TempIn1 = u16Temp1Array[0];
     pSysStatus->TempOutput1 = u16Temp1Array[1];
@@ -116,10 +107,10 @@ static void MbReadSensorsProc(void) {
   u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
   if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
     // error handler
-    SEGGER_RTT_printf(0, RTT_CTRL_TEXT_BRIGHT_RED "read temperature failed\r\n");
-    SEGGER_RTT_printf(0, RTT_CTRL_RESET);
+    INFO_PRINTF(RTT_CTRL_TEXT_BRIGHT_RED "read temperature failed\r\n");
+    INFO_PRINTF(RTT_CTRL_RESET);
   } else {
-    SEGGER_RTT_printf(0, "read Temp2 ch0:%d ch1:%d ch2:%d ch3:%d\r\n",
+    DEBUG_PRINTF("read Temp2 ch0:%d ch1:%d ch2:%d ch3:%d\r\n",
     u16Temp2Array[0], u16Temp2Array[1], u16Temp2Array[2], u16Temp2Array[3]);
     pSysStatus->TempIn3 = u16Temp2Array[0];
     pSysStatus->TempOutput3 = u16Temp2Array[1];
@@ -138,10 +129,10 @@ static void MbReadSensorsProc(void) {
   u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
   if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
     // error handler
-    SEGGER_RTT_printf(0, RTT_CTRL_TEXT_BRIGHT_RED "write DIO failed\r\n");
-    SEGGER_RTT_printf(0, RTT_CTRL_RESET);
+    INFO_PRINTF(RTT_CTRL_TEXT_BRIGHT_RED "write DIO failed\r\n");
+    INFO_PRINTF(RTT_CTRL_RESET);
   } else {
-    SEGGER_RTT_printf(0, "write DIO:%04X(%03d)\r\n", u16DIO, u16DIO);
+    DEBUG_PRINTF(0, "write DIO:%04X(%03d)\r\n", u16DIO, u16DIO);
   }
 }
 
