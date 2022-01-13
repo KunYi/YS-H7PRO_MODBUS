@@ -54,10 +54,18 @@
   for MDK-ARM
   GCC/IAR need definition a section in linkscript
 */
+
+#if defined ( __CC_ARM ) /* for KEIL/ARM */
 #define CONST_FW_INFO_BASE (0x801FF00)
-const char FW_PROJ[] __attribute__((at(CONST_FW_INFO_BASE))) = "TAIRONE";
-const uint8_t FW_VER[] __attribute__((at((CONST_FW_INFO_BASE+0x10)))) = { 1, 0, 0, 0};
+const char FW_PROJ[16] __attribute__((at(CONST_FW_INFO_BASE))) = "TAIRONE";
+const uint8_t FW_VER[8] __attribute__((at((CONST_FW_INFO_BASE+0x10)))) = { 1, 0, 0, 0};
 const char FW_BUILDDATE[16] __attribute__((at((CONST_FW_INFO_BASE+0x18)))) = __DATE__;
+#else /* for GCC */
+const char FW_PROJ[16]  __attribute__ ((section (".fw_info"))) = "TAIRONE";
+const uint8_t FW_VER[8]  __attribute__ ((section (".fw_info"))) = { 1, 0, 0, 0};
+const char FW_BUILDDATE[16]  __attribute__ ((section (".fw_info"))) = __DATE__;
+#endif
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
