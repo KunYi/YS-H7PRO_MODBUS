@@ -28,32 +28,32 @@ enum OffsetMBSetting {
     R20_TEMP8_OUT = 20,
     R21_TOTAL_DRAIN_TIME = 21,
     R22_OP_TOWER_NUM = 22,
-    R23_OP_MINUTE = 23,
-    R24_DIGITAL_INPUT = 24,
+    R23_OP_MINUTE = 23,                 /* for display tower operation time */
+    R24_DIGITAL_INPUT = 24,             /* Digital Input */
     R25_RESERVE = 25,
     R26_RESERVE = 26,
     R27_DRAIN_TIME = 27,
     R28_CLEANING_COOLDOWN = 28,
     R29_VALVE_SWITCH_TIME = 29,
-    R30_PUMP_NOWATER = 30,
-    R31_PUMP_COOLDOWN = 31,
+    R30_PUMP_NOWATER = 30,              /* for display no flow when pump active */
+    R31_PUMP_COOLDOWN = 31,             /* for display cool down of pump */
     R32_SOURCE_FLOW = 32,
     R33_NBIOT_PROC = 33,
     R34_SYS_TIME_RL = 34,
     R35_SYS_TIME_RH = 35,
-    R36_RUN_MODE = 36,
-    R37_TOWER_ENABLED = 37,
-    R38_TOWER1_TIME = 38,
-    R39_TOWER2_TIME = 39,
-    R40_TOWER3_TIME = 40,
-    R41_TOWER4_TIME = 41,
-    R42_TOWER5_TIME = 42,
-    R43_TOWER6_TIME = 43,
-    R44_TOWER7_TIME = 44,
-    R45_TOWER8_TIME = 45,
-    R46_PUMP_NOWATER_TIME = 46,
-    R47_PUMP_COOLDOWN_TIME = 47,
-    R48_EC_TRIGGER = 48,
+    R36_RUN_MODE = 36,                  /* for switch run/settings */
+    R37_TOWER_ENABLED = 37,             /* for select tower range */
+    R38_TOWER1_TIME = 38,               /* operation time setting for tower 1 */
+    R39_TOWER2_TIME = 39,               /* operation time setting for tower 2 */
+    R40_TOWER3_TIME = 40,               /* operation time setting for tower 3 */
+    R41_TOWER4_TIME = 41,               /* operation time setting for tower 4 */
+    R42_TOWER5_TIME = 42,               /* operation time setting for tower 5 */
+    R43_TOWER6_TIME = 43,               /* operation time setting for tower 6 */
+    R44_TOWER7_TIME = 44,               /* operation time setting for tower 7 */
+    R45_TOWER8_TIME = 45,               /* operation time setting for tower 8 */
+    R46_PUMP_NOWATER_TIME = 46,         /* protect time setting when enable pump but no flow */
+    R47_PUMP_COOLDOWN_TIME = 47,        /* cool down time setting for pump */
+    R48_EC_TRIGGER = 48,                /* EC condition setting for trigger */
     R49_PH_TRIGGER = 49,
     R50_CLEANING_TIME = 50,
     R51_CLEANING_COOLDOWN_TIME = 51,
@@ -64,6 +64,7 @@ enum OffsetMBSetting {
     R56_SYS_TIME_WL = 56,
     R57_SYS_TIME_WH = 57,
     R58_MANUAL_CMD = 58,
+    MAX_SETTINGS_REG = 59
 };
 
 enum RUN_MODE {
@@ -81,6 +82,8 @@ enum RUN_MODE {
 #define KEIL_PACKED
 #define GCC_PACKED __attribute__((packed))
 #endif
+
+#if 0
 struct  SystemSettings {
     uint16_t    towerID;                /* R00, Write/Read */
     uint16_t    temp1In;                /* R01, Read only */
@@ -142,8 +145,8 @@ struct  SystemSettings {
     uint16_t    myTimeLowW;             /* R56, Write only */
     uint16_t    myTimeHighW;            /* R57, Write only */
     uint16_t    manualCmd;              /* R58, Write only */
-}GCC_PACKED ;
+} GCC_PACKED ;
+#endif
 
-extern struct SystemSettings*  pSysSettings;
-extern uint16_t SysSettings[(sizeof(struct SystemSettings)/sizeof(uint16_t))];
+extern uint16_t SysSettings[MAX_SETTINGS_REG];
 #endif /* End of _SYS_SETTINGS_H */

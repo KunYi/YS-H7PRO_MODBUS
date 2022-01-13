@@ -50,26 +50,25 @@ void checkAndLoadCfg(void)
   }
 
   // restore to SysSettings
-  pSysSettings->towerID = sysCfg.towerID;
-  pSysSettings->runMode = sysCfg.runMode;
-  pSysSettings->towersEnabled = sysCfg.towersEnabled;
+  SysSettings[R00_TOWER_ID] = sysCfg.towerID;
+  SysSettings[R36_RUN_MODE] = sysCfg.runMode;
+  SysSettings[R37_TOWER_ENABLED] = sysCfg.towersEnabled;
 
-  uint16_t *pPointer = &pSysSettings->tower1SettingTime;
   for (int i = 0; i < 8; i++) {
-    *pPointer = sysCfg.towerTime[i];
-    pPointer++;
+    SysSettings[R38_TOWER1_TIME + i] = sysCfg.towerTime[i];
   }
-  pSysSettings->valveSwitchTime = sysCfg.valveSwitchTime;
-  pSysSettings->pumpNoWaterTime = sysCfg.pumpNoWaterTime;
-  pSysSettings->pumpCoolDownTime = sysCfg.pumpCoolDownTime;
-  pSysSettings->triggerEC = sysCfg.triggerEC;
-  pSysSettings->triggerPH = sysCfg.triggerPH;
-  pSysSettings->cleaningTime = sysCfg.cleaningTime;
-  pSysSettings->cleaningCoolDownTime = sysCfg.cleaningCoolDownTime;
-  pSysSettings->nbIoTProcTime = sysCfg.nbIoTProcTime;
-  pSysSettings->nbIoTPowerOffTime = sysCfg.nbIoTPowerOffTime;
-  pSysSettings->sourceFlowTime = sysCfg.sourceFlowTime;
-  pSysSettings->fieldMask = sysCfg.fieldMask;
+
+  SysSettings[R29_VALVE_SWITCH_TIME] = sysCfg.valveSwitchTime;
+  SysSettings[R46_PUMP_NOWATER_TIME] = sysCfg.pumpNoWaterTime;
+  SysSettings[R47_PUMP_COOLDOWN_TIME] = sysCfg.pumpCoolDownTime;
+  SysSettings[R48_EC_TRIGGER] = sysCfg.triggerEC;
+  SysSettings[R49_PH_TRIGGER] = sysCfg.triggerPH;
+  SysSettings[R50_CLEANING_TIME] = sysCfg.cleaningTime;
+  SysSettings[R51_CLEANING_COOLDOWN_TIME] = sysCfg.cleaningCoolDownTime;
+  SysSettings[R52_SOURCE_FLOW_TIME] = sysCfg.sourceFlowTime;
+  SysSettings[R53_NBIOT_TIME] = sysCfg.nbIoTProcTime;
+  SysSettings[R54_NBIOT_POWEROFF_TIME] = sysCfg.nbIoTPowerOffTime;
+  SysSettings[R55_FIELD_MASK] = sysCfg.fieldMask;
 }
 
 void updateAndSaveCfg(void)
@@ -77,27 +76,25 @@ void updateAndSaveCfg(void)
   struct CFG sysCfg;
   INIT_CFG(&sysCfg);
 
-  sysCfg.towerID = pSysSettings->towerID;
-  sysCfg.runMode = pSysSettings->runMode;
-  sysCfg.towersEnabled =  pSysSettings->towersEnabled;
+  sysCfg.towerID = SysSettings[R00_TOWER_ID];
+  sysCfg.runMode = SysSettings[R36_RUN_MODE];
+  sysCfg.towersEnabled =  SysSettings[R37_TOWER_ENABLED];
 
-  uint16_t *pPointer = &pSysSettings->tower1SettingTime;
   for (int i = 0; i < 8; i++) {
-     sysCfg.towerTime[i] = *pPointer;
-     pPointer++;
+     sysCfg.towerTime[i] = SysSettings[R38_TOWER1_TIME + i];
   }
 
-  sysCfg.valveSwitchTime = pSysSettings->valveSwitchTime;
-  sysCfg.pumpNoWaterTime = pSysSettings->pumpNoWaterTime;
-  sysCfg.pumpCoolDownTime = pSysSettings->pumpCoolDownTime;
-  sysCfg.triggerEC = pSysSettings->triggerEC;
-  sysCfg.triggerPH = pSysSettings->triggerPH;
-  sysCfg.cleaningTime = pSysSettings->cleaningTime;
-  sysCfg.cleaningCoolDownTime = pSysSettings->cleaningCoolDownTime;
-  sysCfg.nbIoTProcTime = pSysSettings->nbIoTProcTime;
-  sysCfg.nbIoTPowerOffTime = pSysSettings->nbIoTPowerOffTime;
-  sysCfg.sourceFlowTime = pSysSettings->sourceFlowTime;
-  sysCfg.fieldMask = pSysSettings->fieldMask;
+  sysCfg.valveSwitchTime = SysSettings[R29_VALVE_SWITCH_TIME];
+  sysCfg.pumpNoWaterTime = SysSettings[R46_PUMP_NOWATER_TIME];
+  sysCfg.pumpCoolDownTime = SysSettings[R47_PUMP_COOLDOWN_TIME];
+  sysCfg.triggerEC = SysSettings[R48_EC_TRIGGER];
+  sysCfg.triggerPH = SysSettings[R49_PH_TRIGGER];
+  sysCfg.cleaningTime = SysSettings[R50_CLEANING_TIME];
+  sysCfg.cleaningCoolDownTime = SysSettings[R51_CLEANING_COOLDOWN_TIME];
+  sysCfg.sourceFlowTime = SysSettings[R52_SOURCE_FLOW_TIME];
+  sysCfg.nbIoTProcTime = SysSettings[R53_NBIOT_TIME];
+  sysCfg.nbIoTPowerOffTime = SysSettings[R54_NBIOT_POWEROFF_TIME];
+  sysCfg.fieldMask = SysSettings[R55_FIELD_MASK];
   saveCFG(&sysCfg);
 }
 

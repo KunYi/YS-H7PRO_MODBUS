@@ -24,12 +24,9 @@ enum SAVE_MAGIC_CMD {
     SAVE_CMD_MAGIC = 0xA321,
 };
 
-static modbusHandler_t MBSettingsH;
-static uint16_t        ModusSlaveDataBuffer[(sizeof(struct SystemSettings)/sizeof(uint16_t))];
-uint16_t        SysSettings[(sizeof(struct SystemSettings)/sizeof(uint16_t))];
-struct SystemSettings*  pSysSettings=(struct SystemSettings*)SysSettings;
-
-
+static modbusHandler_t  MBSettingsH;
+static uint16_t         ModusSlaveDataBuffer[MAX_SETTINGS_REG];
+uint16_t                SysSettings[MAX_SETTINGS_REG];
 
 void InitMbSettings(void);
 void StartMbSettingsTask(void *argument);
@@ -74,8 +71,8 @@ static void checkAndUpdateSysTime(void) {
   uint32_t valNew = MBSettingsH.u16regs[R57_SYS_TIME_WH] * 65536 +  MBSettingsH.u16regs[R56_SYS_TIME_WL];
 
   if (valNew != 0) {
-    pSysSettings->myTimeLow = MBSettingsH.u16regs[R56_SYS_TIME_WL];
-    pSysSettings->myTimeHigh = MBSettingsH.u16regs[R57_SYS_TIME_WH];
+    SysSettings[R34_SYS_TIME_RL] = MBSettingsH.u16regs[R56_SYS_TIME_WL];
+    SysSettings[R35_SYS_TIME_RH] = MBSettingsH.u16regs[R57_SYS_TIME_WH];
     syncRTCTime(valNew);
   }
 }
@@ -144,15 +141,15 @@ static void checkAndUpdateManualOp(void) {
 }
 
 static void updateSettingsValue(void) {
-  if (MBSettingsH.u16regs[R00_TOWER_ID] != pSysSettings->towerID) {
+  if (MBSettingsH.u16regs[R00_TOWER_ID] != SysSettings[R00_TOWER_ID]) {
     DEBUG_PRINTF("Update TowerID: %d\n", MBSettingsH.u16regs[R00_TOWER_ID]);
-    pSysSettings->towerID = MBSettingsH.u16regs[R00_TOWER_ID];
+    SysSettings[R00_TOWER_ID] = MBSettingsH.u16regs[R00_TOWER_ID];
   }
 
-  if (MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME] != pSysSettings->valveSwitchTime)
+  if (MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME] != SysSettings[R29_VALVE_SWITCH_TIME])
   {
     DEBUG_PRINTF("Update ValeSwitch Time: %d\n", MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME]);
-    pSysSettings->valveSwitchTime = MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME];
+    SysSettings[R29_VALVE_SWITCH_TIME] = MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME];
   }
 
   for (int i = R36_RUN_MODE; i <= R55_FIELD_MASK; i++) {
@@ -167,12 +164,10 @@ static void MbSettingsProc(void) {
   checkAndUpdateSysTime();
   checkAndUpdateManualOp();
   updateSettingsValue();
-  memcpy(ModusSlaveDataBuffer, pSysSettings, sizeof(SysSettings));
+  memcpy(ModusSlaveDataBuffer, SysSettings, sizeof(SysSettings));
 }
 
 void InitMbSettings(void) {
-	pSysSettings=(struct SystemSettings*)SysSettings;
-  memcpy(ModusSlaveDataBuffer, pSysSettings, sizeof(SysSettings));
   /* Modbus Slave initialization */
   MBSettingsH.uModbusType = MB_SLAVE;
   MBSettingsH.xTypeHW = USART_HW;
@@ -190,6 +185,8 @@ void InitMbSettings(void) {
   MBSettingsH.u16regs = ModusSlaveDataBuffer;
   MBSettingsH.u16regsize= sizeof(ModusSlaveDataBuffer)/sizeof(ModusSlaveDataBuffer[0]);
   MBSettingsH.u8regsmask = NULL;
+
+  memcpy(ModusSlaveDataBuffer, SysSettings, sizeof(SysSettings));
   //Initialize Modbus library
   ModbusInit(&MBSettingsH);
   //Start capturing traffic on serial Port
