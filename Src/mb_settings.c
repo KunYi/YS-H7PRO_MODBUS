@@ -26,7 +26,7 @@ enum SAVE_MAGIC_CMD {
 
 static modbusHandler_t MBSettingsH;
 static uint16_t        ModusSlaveDataBuffer[(sizeof(struct SystemSettings)/sizeof(uint16_t))];
-static uint16_t        SysSettings[(sizeof(struct SystemSettings)/sizeof(uint16_t))];
+uint16_t        SysSettings[(sizeof(struct SystemSettings)/sizeof(uint16_t))];
 struct SystemSettings*  pSysSettings=(struct SystemSettings*)SysSettings;
 
 

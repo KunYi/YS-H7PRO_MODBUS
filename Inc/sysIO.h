@@ -83,7 +83,17 @@ extern union OUTPUT sysOut;
 #define DI2  sysIn.in.X2
 #define DI3  sysIn.in.X3
 
+#define PUMP_ON_CTRL          DO2
+#define TURN_ON_PUMP          (1)
+#define TURN_OFF_PUMP         (0)
 
+#define FLOW_STATUS           DI0   /* water flow status */
+#define FLOW_ACTIVE_STATUS    (1)
+#define FLOW_INACTIVE_STATUS  (0)
+
+#define PUMP_STATUS           DI1  /* pump active status */
+#define PUMP_ACTIVE_STATUS    (1)
+#define PUMP_INACTIVE_STATUS  (0)
 void initSysIO(void);
 void sysSetOutput(uint8_t num);
 #endif /* end of file, _SYS_IO_H_ */

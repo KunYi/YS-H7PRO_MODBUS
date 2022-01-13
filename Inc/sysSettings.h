@@ -74,6 +74,13 @@ enum RUN_MODE {
 #define DI_MASK_FLOW    (0x0001)
 #define DI_MASK_PUMP    (0x0002)
 
+#if defined ( __CC_ARM )
+#define KEIL_PACKED __attribute__((packed))
+#define GCC_PACKED
+#else
+#define KEIL_PACKED
+#define GCC_PACKED __attribute__((packed))
+#endif
 struct  SystemSettings {
     uint16_t    towerID;                /* R00, Write/Read */
     uint16_t    temp1In;                /* R01, Read only */
@@ -122,8 +129,8 @@ struct  SystemSettings {
     uint16_t    tower6SettingTime;      /* R43 */
     uint16_t    tower7SettingTime;      /* R44 */
     uint16_t    tower8SettingTime;      /* R45 */
-    uint16_t    pumpNoWaterTime;        /* R46 */
-    uint16_t    pumpCoolDownTime;       /* R47 */
+    uint16_t    pumpNoWaterTime;        /* R46, for Pump Protect when no water flow, the pump can't run over the time */
+    uint16_t    pumpCoolDownTime;       /* R47, for Pump Cool Down */
     uint16_t    triggerEC;              /* R48 */
     uint16_t    triggerPH;              /* R49 */
     uint16_t    cleaningTime;           /* R50 */
@@ -135,7 +142,8 @@ struct  SystemSettings {
     uint16_t    myTimeLowW;             /* R56, Write only */
     uint16_t    myTimeHighW;            /* R57, Write only */
     uint16_t    manualCmd;              /* R58, Write only */
-};
+}GCC_PACKED ;
 
 extern struct SystemSettings*  pSysSettings;
+extern uint16_t SysSettings[(sizeof(struct SystemSettings)/sizeof(uint16_t))];
 #endif /* End of _SYS_SETTINGS_H */
