@@ -107,6 +107,7 @@ void StartDefaultTask(void *argument);
 extern void StartMbReadSensorsTask(void *argument);
 extern void StartMbSettingsTask(void *argument);
 extern void StartMbIoTTask(void *argument);
+extern void basic1SecCallback(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -222,3 +223,4 @@ void StartDbgTask(void *argument)
   }
 }
 /* USER CODE END Application */
+

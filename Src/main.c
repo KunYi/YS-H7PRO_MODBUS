@@ -114,7 +114,7 @@ int main(void)
   ModbusInitVar();
   initSwTimer();
   initSysIO();
-  printf(RTT_CTRL_CLEAR RTT_CTRL_RESET  "complete STM32H743 init\n");
+  printf(RTT_CTRL_CLEAR RTT_CTRL_RESET  "complete STM32H743 init with GCC\n");
   DEBUG_PRINTF("STM32H743 Project start - RTT\n");
   checkAndLoadCfg();
 
@@ -257,3 +257,4 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
+
