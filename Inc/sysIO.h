@@ -83,6 +83,10 @@ extern union OUTPUT sysOut;
 #define DI2  sysIn.in.X2
 #define DI3  sysIn.in.X3
 
+#define VALVE_ON_CTRL         DO0
+#define TURN_ON_VALVE         (1)
+#define TURN_OFF_VALVE        (0)
+
 #define PUMP_ON_CTRL          DO2
 #define TURN_ON_PUMP          (1)
 #define TURN_OFF_PUMP         (0)

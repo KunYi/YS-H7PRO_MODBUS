@@ -53,6 +53,8 @@ void TowerProc(void)
 {
   if (SysSettings[R36_RUN_MODE] != MODE_RUNNING) {
       towerState = TOWER_OPERATION_INIT;
+			SysSettings[R22_OP_TOWER_NUM] = 0;
+      SysSettings[R23_OP_MINUTE] = 0;
       return;
   }
 
@@ -71,7 +73,7 @@ void TowerProc(void)
     dbgCount = 0;
     towerData.currentTower = getNextTower(towerData.currentTower);
     if (towerData.currentTower >= 0) {
-      DEBUG_PRINTF("SELECT_TOWER towerId:%d, TRANSTION to ENALE_TOWER\n", towerData.currentTower);
+      DEBUG_PRINTF("SELECT_TOWER towerId:%d, TRANSTION to ENABLE_TOWER\n", towerData.currentTower);
       towerData.retryCounter  = 0;
       towerState = ENABLE_TOWER;
     } else {

@@ -18,6 +18,7 @@
 #include "cfg.h"
 #include "debug.h"
 #include "sysIO.h"
+#include "cleanProc.h"
 
 
 enum SAVE_MAGIC_CMD {
@@ -26,7 +27,7 @@ enum SAVE_MAGIC_CMD {
 
 static modbusHandler_t  MBSettingsH;
 static uint16_t         ModusSlaveDataBuffer[MAX_SETTINGS_REG];
-uint16_t                SysSettings[MAX_SETTINGS_REG];
+volatile uint16_t       SysSettings[MAX_SETTINGS_REG];
 
 void InitMbSettings(void);
 void StartMbSettingsTask(void *argument);
@@ -148,7 +149,10 @@ static void updateSettingsValue(void) {
 
   if (MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME] != SysSettings[R29_VALVE_SWITCH_TIME])
   {
-    DEBUG_PRINTF("Update ValeSwitch Time: %d\n", MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME]);
+    if (MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME] == 0) {
+      resetCumulateDrainTime();
+    }
+    DEBUG_PRINTF("Reset ValeSwitch Time: %d\n", MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME]);
     SysSettings[R29_VALVE_SWITCH_TIME] = MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME];
   }
 
@@ -160,11 +164,21 @@ static void updateSettingsValue(void) {
   }
 }
 
+static void initSysSettings(void) {
+  for (int i = 0; i < MAX_SETTINGS_REG; i++)
+	  SysSettings[i] = 0;
+}
+
+static void updateModbusMappingRegisters(void) {
+  for (int i = 0; i < MAX_SETTINGS_REG; i++)
+	  ModusSlaveDataBuffer[i] = SysSettings[i];
+}
+
 static void MbSettingsProc(void) {
   checkAndUpdateSysTime();
   checkAndUpdateManualOp();
   updateSettingsValue();
-  memcpy(ModusSlaveDataBuffer, SysSettings, sizeof(SysSettings));
+  updateModbusMappingRegisters();
 }
 
 void InitMbSettings(void) {
@@ -185,8 +199,8 @@ void InitMbSettings(void) {
   MBSettingsH.u16regs = ModusSlaveDataBuffer;
   MBSettingsH.u16regsize= sizeof(ModusSlaveDataBuffer)/sizeof(ModusSlaveDataBuffer[0]);
   MBSettingsH.u8regsmask = NULL;
-
-  memcpy(ModusSlaveDataBuffer, SysSettings, sizeof(SysSettings));
+  initSysSettings();
+  updateModbusMappingRegisters();
   //Initialize Modbus library
   ModbusInit(&MBSettingsH);
   //Start capturing traffic on serial Port

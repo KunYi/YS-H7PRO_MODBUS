@@ -116,7 +116,7 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Src/towerProc.c</locationURI>
 		</link>
 		<link>
-			<name>Application/User/cleanPoc.c</name>
+			<name>Application/User/cleanProc.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/cleanProc.c</locationURI>
 		</link>		

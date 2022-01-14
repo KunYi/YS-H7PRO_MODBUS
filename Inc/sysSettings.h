@@ -148,5 +148,5 @@ struct  SystemSettings {
 } GCC_PACKED ;
 #endif
 
-extern uint16_t SysSettings[MAX_SETTINGS_REG];
+extern volatile uint16_t SysSettings[MAX_SETTINGS_REG];
 #endif /* End of _SYS_SETTINGS_H */
