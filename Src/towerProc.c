@@ -53,7 +53,7 @@ void TowerProc(void)
 {
   if (SysSettings[R36_RUN_MODE] != MODE_RUNNING) {
       towerState = TOWER_OPERATION_INIT;
-			SysSettings[R22_OP_TOWER_NUM] = 0;
+      SysSettings[R22_OP_TOWER_NUM] = 0;
       SysSettings[R23_OP_MINUTE] = 0;
       return;
   }
@@ -64,10 +64,10 @@ void TowerProc(void)
     towerState = SELECT_TOWER;
     memset(&towerData, 0, sizeof(struct TowerOperationData));
     towerData.currentTower = -1;
+    SysSettings[R22_OP_TOWER_NUM] = 0;
+    SysSettings[R23_OP_MINUTE] = 0;
     SysSettings[R30_PUMP_NOWATER] = 0;
     SysSettings[R31_PUMP_COOLDOWN] = 0;
-    SysSettings[R23_OP_MINUTE] = 0;
-    SysSettings[R22_OP_TOWER_NUM] = 0;
 
   case SELECT_TOWER:
     dbgCount = 0;

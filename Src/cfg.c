@@ -35,10 +35,16 @@ void saveInitCFG(void)
     saveCFG(&defCfg);
 }
 
+static void initSysSettings(void) {
+  for (int i = 0; i < MAX_SETTINGS_REG; i++)
+	  SysSettings[i] = 0;
+}
+
 void checkAndLoadCfg(void)
 {
   struct CFG sysCfg;
 
+  initSysSettings();
   readCFG(&sysCfg);
   // for default value when config is empty
   if (sysCfg.magicMark != CFG_MAGIC) {

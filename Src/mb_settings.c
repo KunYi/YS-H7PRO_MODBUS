@@ -1,5 +1,4 @@
 
-
 #include "FreeRTOS.h"
 #include "task.h"
 #include "main.h"
@@ -164,11 +163,6 @@ static void updateSettingsValue(void) {
   }
 }
 
-static void initSysSettings(void) {
-  for (int i = 0; i < MAX_SETTINGS_REG; i++)
-	  SysSettings[i] = 0;
-}
-
 static void updateModbusMappingRegisters(void) {
   for (int i = 0; i < MAX_SETTINGS_REG; i++)
 	  ModusSlaveDataBuffer[i] = SysSettings[i];
@@ -199,7 +193,6 @@ void InitMbSettings(void) {
   MBSettingsH.u16regs = ModusSlaveDataBuffer;
   MBSettingsH.u16regsize= sizeof(ModusSlaveDataBuffer)/sizeof(ModusSlaveDataBuffer[0]);
   MBSettingsH.u8regsmask = NULL;
-  initSysSettings();
   updateModbusMappingRegisters();
   //Initialize Modbus library
   ModbusInit(&MBSettingsH);
