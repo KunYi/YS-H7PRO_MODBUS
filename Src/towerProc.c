@@ -45,10 +45,6 @@ static int8_t getNextTower(uint8_t n) {
     return -1;
 }
 
-void initTowerProc(void) {
-  towerState = TOWER_OPERATION_INIT;
-}
-
 static void initOutput(void)
 {
     VALVE_ON_CTRL = TURN_OFF_VALVE;
@@ -56,6 +52,11 @@ static void initOutput(void)
     ELECTRODE_ON_CTRL = TURN_OFF_ELECTRODE;
     for (int i = 0; i < 8; i++)
       sysTurnOffTower(i);
+}
+
+void initTowerProc(void) {
+  towerState = TOWER_OPERATION_INIT;
+  initOutput();
 }
 
 void TowerProc(void)
@@ -77,7 +78,7 @@ void TowerProc(void)
     SysSettings[R23_OP_MINUTE] = 0;
     SysSettings[R30_PUMP_NOWATER] = 0;
     SysSettings[R31_PUMP_COOLDOWN] = 0;
-	initOutput();
+    initOutput();
 
   case SELECT_TOWER:
     dbgCount = 0;
