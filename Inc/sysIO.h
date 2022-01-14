@@ -28,10 +28,12 @@ struct bitOut {
   uint16_t Y9: 1;
   uint16_t Y10: 1;
   uint16_t Y11: 1;
+  /*
   uint16_t Y12: 1;
   uint16_t Y13: 1;
   uint16_t Y14: 1;
   uint16_t Y15: 1;
+  */
 };
 
 union OUTPUT {
@@ -52,14 +54,17 @@ enum _DIGITAL_OUTPUT_ {
   NUM_DO9 = 9,
   NUM_DO10 = 10,
   NUM_DO11 = 11,
+  /*
   NUM_DO12 = 12,
   NUM_DO13 = 13,
   NUM_DO14 = 14,
   NUM_DO15 = 15,
+  */
+  MAX_NUM_DO
 };
 
-extern union INPUT sysIn;
-extern union OUTPUT sysOut;
+extern volatile union INPUT sysIn;
+extern volatile union OUTPUT sysOut;
 
 #define DO0  sysOut.out.Y0
 #define DO1  sysOut.out.Y1
@@ -73,10 +78,12 @@ extern union OUTPUT sysOut;
 #define DO9  sysOut.out.Y9
 #define DO10 sysOut.out.Y10
 #define DO11 sysOut.out.Y11
+/*
 #define DO12 sysOut.out.Y12
 #define DO13 sysOut.out.Y13
 #define DO14 sysOut.out.Y14
 #define DO15 sysOut.out.Y15
+*/
 
 #define DI0  sysIn.in.X0
 #define DI1  sysIn.in.X1
@@ -87,9 +94,17 @@ extern union OUTPUT sysOut;
 #define TURN_ON_VALVE         (1)
 #define TURN_OFF_VALVE        (0)
 
+#define NBIOT_ON_CTRL         DO1
+#define TURN_ON_NBIOT         (1)
+#define TURN_OFF_NBIOT        (0)
+
 #define PUMP_ON_CTRL          DO2
 #define TURN_ON_PUMP          (1)
 #define TURN_OFF_PUMP         (0)
+
+#define ELECTRODE_ON_CTRL     (DO3)
+#define TURN_ON_ELECTRODE     (1)
+#define TURN_OFF_ELECTRODE    (0)
 
 #define FLOW_STATUS           DI0   /* water flow status */
 #define FLOW_ACTIVE_STATUS    (1)

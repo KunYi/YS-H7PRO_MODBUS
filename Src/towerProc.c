@@ -49,6 +49,15 @@ void initTowerProc(void) {
   towerState = TOWER_OPERATION_INIT;
 }
 
+static void initOutput(void)
+{
+    VALVE_ON_CTRL = TURN_OFF_VALVE;
+    PUMP_ON_CTRL = TURN_OFF_PUMP;
+    ELECTRODE_ON_CTRL = TURN_OFF_ELECTRODE;
+    for (int i = 0; i < 8; i++)
+      sysTurnOffTower(i);
+}
+
 void TowerProc(void)
 {
   if (SysSettings[R36_RUN_MODE] != MODE_RUNNING) {
@@ -68,6 +77,7 @@ void TowerProc(void)
     SysSettings[R23_OP_MINUTE] = 0;
     SysSettings[R30_PUMP_NOWATER] = 0;
     SysSettings[R31_PUMP_COOLDOWN] = 0;
+	initOutput();
 
   case SELECT_TOWER:
     dbgCount = 0;
@@ -182,6 +192,9 @@ void TowerProc(void)
     break;
 
   case ERROR_STOP:
+    initOutput();
+    ELECTRODE_ON_CTRL = TURN_ON_ELECTRODE;
+    SysSettings[R22_OP_TOWER_NUM] = 9;
     break;
   } /* end of switch(towerState) */
 

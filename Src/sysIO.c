@@ -1,7 +1,7 @@
 #include "sysIO.h"
 
-union INPUT sysIn;
-union OUTPUT sysOut;
+volatile union INPUT sysIn;
+volatile union OUTPUT sysOut;
 
 void initSysIO() {
     sysIn._in = 0;
