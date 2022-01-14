@@ -9,6 +9,11 @@
 #define MODBUS_SLAVE_ID	       (1)
 #define TOWER_ID               (12345)
 
+/* for NBIOT */
+#define UPLOAD_PERIOD          (15 * 60)    /* 15 minutes   */
+#define WAIT_FIRST_UPLOAD      (3*60 + 30)  /* 3.5 minutes  */
+#define TURNOFF_TIME           (30)         /* 30 seoncd    */
+
 /* BCD format */
 /* default 01/20/2022, 19:30:30 */
 #define DEFAULT_TIME_HOUR      (0x19)
