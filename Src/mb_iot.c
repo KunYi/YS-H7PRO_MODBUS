@@ -13,19 +13,10 @@
 #include "defaultConfig.h"
 
 void InitMbIoT(void);
-void StartMbIoTTask(void *argument);
 
-static void ModbusIoTProc(void);
+void modbusIoTProc(void);
 
-void StartMbIoTTask(void *argument)
-{
-  for(;;) {
-    ModbusIoTProc();
-    osDelay(1000);
-  }
-}
-
-static void ModbusIoTProc(void) {
+void modbusIoTProc(void) {
 
 }
 

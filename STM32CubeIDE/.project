@@ -36,6 +36,21 @@
 			<locationURI>PARENT-1-PROJECT_LOC/YS-H7Multi.ioc</locationURI>
 		</link>
 		<link>
+			<name>Application/User/SysIO.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/SysIO.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/cfg.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/cfg.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/cleanProc.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/cleanProc.c</locationURI>
+		</link>
+		<link>
 			<name>Application/User/freertos.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/freertos.c</locationURI>
@@ -49,6 +64,26 @@
 			<name>Application/User/main.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/main.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/mb_app.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/mb_app.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/mb_iot.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/mb_iot.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/mb_settings.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/mb_settings.c</locationURI>
+		</link>
+		<link>
+			<name>Application/User/mytime.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/mytime.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/rtc.c</name>
@@ -71,44 +106,9 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Src/stm32h7xx_it.c</locationURI>
 		</link>
 		<link>
-			<name>Application/User/usart.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/usart.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/mb_app.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/mb_app.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/mb_iot.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/mb_iot.c</locationURI>
-		</link>			
-		<link>
-			<name>Application/User/mb_settings.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/mb_settings.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/mytime.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/mytime.c</locationURI>
-		</link>
-		<link>
-			<name>Application/User/cfg.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/cfg.c</locationURI>
-		</link>
-		<link>
 			<name>Application/User/swTimer.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/swTimer.c</locationURI>
-		</link>			
-		<link>
-			<name>Application/User/SysIO.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/SysIO.c</locationURI>
 		</link>
 		<link>
 			<name>Application/User/towerProc.c</name>
@@ -116,10 +116,10 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Src/towerProc.c</locationURI>
 		</link>
 		<link>
-			<name>Application/User/cleanProc.c</name>
+			<name>Application/User/usart.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/cleanProc.c</locationURI>
-		</link>		
+			<locationURI>PARENT-1-PROJECT_LOC/Src/usart.c</locationURI>
+		</link>
 		<link>
 			<name>Drivers/CMSIS/system_stm32h7xx.c</name>
 			<type>1</type>
@@ -286,29 +286,29 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Middlewares/Third_Party/FreeRTOS/Source/timers.c</locationURI>
 		</link>
 		<link>
+			<name>Middlewares/ModbusLib/Modbus.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/ModbusLib/Src/Modbus.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/ModbusLib/UARTCallback.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/ModbusLib/Src/UARTCallback.c</locationURI>
+		</link>
+		<link>
 			<name>Middlewares/SEGGER_RTT/SEGGER_RTT.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/SEGGER_RTT/SEGGER_RTT.c</locationURI>
+		</link>
+		<link>
+			<name>Middlewares/SEGGER_RTT/SEGGER_RTT_Syscalls_GCC.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/SEGGER_RTT/SEGGER_RTT_Syscalls_GCC.c</locationURI>
 		</link>
 		<link>
 			<name>Middlewares/SEGGER_RTT/SEGGER_RTT_printf.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/SEGGER_RTT/SEGGER_RTT_printf.c</locationURI>
 		</link>
-		<link>
-			<name>Middlewares/SEGGER_RTT/SEGGER_RTT_Syscalls_GCC.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/SEGGER_RTT/SEGGER_RTT_Syscalls_GCC.c</locationURI>
-		</link>		
-		<link>
-			<name>Middlewares/ModbusLib/Modbus.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/ModbusLib/Src/Modbus.c</locationURI>
-		</link>		
-		<link>
-			<name>Middlewares/ModbusLib/UARTCallback.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/ModbusLib/Src/UARTCallback.c</locationURI>
-		</link>	
 	</linkedResources>
 </projectDescription>

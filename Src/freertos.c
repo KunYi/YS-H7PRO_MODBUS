@@ -83,13 +83,6 @@ const osThreadAttr_t myMbSettingsTas_attributes = {
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
-/* Definitions for myMbIoTTask */
-osThreadId_t myMbIoTTaskHandle;
-const osThreadAttr_t myMbIoTTask_attributes = {
-  .name = "myMbIoTTask",
-  .stack_size = 256 * 4,
-  .priority = (osPriority_t) osPriorityLow,
-};
 /* Definitions for basic1SecTimer */
 osTimerId_t basic1SecTimerHandle;
 const osTimerAttr_t basic1SecTimer_attributes = {
@@ -101,13 +94,13 @@ const osTimerAttr_t basic1SecTimer_attributes = {
 extern void InitMbReadSensors(void);
 extern void InitMbSettings(void);
 extern void InitMbIoT(void);
+extern void modbusIoTProc(void);
 void StartDbgTask(void *argument);
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
 extern void StartMbReadSensorsTask(void *argument);
 extern void StartMbSettingsTask(void *argument);
-extern void StartMbIoTTask(void *argument);
 extern void basic1SecCallback(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -138,8 +131,6 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
   InitMbReadSensors();
   InitMbSettings();
-  InitMbIoT();
-
 
   /* USER CODE END Init */
 
@@ -174,9 +165,6 @@ void MX_FREERTOS_Init(void) {
   /* creation of myMbSettingsTas */
   myMbSettingsTasHandle = osThreadNew(StartMbSettingsTask, NULL, &myMbSettingsTas_attributes);
 
-  /* creation of myMbIoTTask */
-  myMbIoTTaskHandle = osThreadNew(StartMbIoTTask, NULL, &myMbIoTTask_attributes);
-
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   dbgTaskHandle = osThreadNew(StartDbgTask, NULL, &dbgTask_attributes);
@@ -198,6 +186,7 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
+  InitMbIoT();
   initTowerProc();
   initCleanProc();
 
@@ -206,6 +195,7 @@ void StartDefaultTask(void *argument)
   {
     TowerProc();
     CleanProc();
+    modbusIoTProc();
     osDelay(10);
   }
   /* USER CODE END StartDefaultTask */
