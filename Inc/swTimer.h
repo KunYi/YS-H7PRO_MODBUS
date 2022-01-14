@@ -5,6 +5,7 @@
 
 void initSwTimer(void);
 uint32_t getTimeCount(void);
+uint32_t getTimeMinuteCount(void);
 
 void basic1SecCallback(void *argument);
 

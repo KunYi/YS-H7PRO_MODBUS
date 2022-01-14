@@ -61,6 +61,15 @@ const osThreadAttr_t dbgTask_attributes = {
   .priority = (osPriority_t) osPriorityLow,
 };
 
+osMutexId_t mutexSysMyTime_id;
+
+const osMutexAttr_t sysMyTime_Mutex_attr = {
+  "MutexSysMyTime",     // human readable mutex name
+  osMutexRecursive,    // attr_bits
+  NULL,                // memory for control block
+  0U                   // size for control block
+};
+
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
@@ -136,6 +145,7 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
+  mutexSysMyTime_id = osMutexNew(&sysMyTime_Mutex_attr);
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */

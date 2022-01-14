@@ -4,17 +4,23 @@
 #include "cmsis_os.h"
 
 #include <stdint.h>
+#include <string.h>
+
 #include "rtc.h"
 #include "SEGGER_RTT.h"
 #include "mytime.h"
 #include "swTimer.h"
 #include "sysSettings.h"
 
-volatile uint32_t timeCount = 0;
+extern osMutexId_t mutexSysMyTime_id;
+static volatile uint32_t timeCount = 0;
+static volatile uint32_t timeMinute = 0;
+static struct MYTIME sysMyTime;
 
 void initSwTimer(void)
 {
     timeCount = 0;
+    timeMinute = 0;
 }
 
 uint32_t getTimeCount(void)
@@ -22,9 +28,24 @@ uint32_t getTimeCount(void)
     return timeCount;
 }
 
+uint32_t getTimeMinuteCount(void)
+{
+    return timeMinute;
+}
+
+void getSysMyTime(struct MYTIME * myTime)
+{
+  osMutexAcquire(mutexSysMyTime_id, osWaitForever);
+  memcpy(myTime, &sysMyTime, sizeof(struct MYTIME));
+  osMutexRelease(mutexSysMyTime_id);
+}
+
 void basic1SecCallback(void *argument)
 {
-  timeCount++;
+  if (++timeCount % 60) {
+    timeMinute++;
+  }
+
   RTC_DateTypeDef sdate={0};
   RTC_TimeTypeDef stime={0};
   /*
@@ -33,15 +54,16 @@ void basic1SecCallback(void *argument)
   */
   HAL_RTC_GetTime(&hrtc, &stime, RTC_FORMAT_BIN);
   HAL_RTC_GetDate(&hrtc, &sdate, RTC_FORMAT_BIN);
-  struct MYTIME temp = {
-                       .year = sdate.Year + 2000,
-                       .month = sdate.Month,
-                       .day = sdate.Date,
-                       .hour = stime.Hours,
-                       .minute = stime.Minutes,
-                       .second = stime.Seconds
-                      };
-  uint32_t epoch = datetime_since_epoch(&temp);
+
+  osMutexAcquire(mutexSysMyTime_id, osWaitForever);
+  sysMyTime.year = sdate.Year + 2000;
+  sysMyTime.month = sdate.Month;
+  sysMyTime.day = sdate.Date;
+  sysMyTime.minute = stime.Minutes;
+  sysMyTime.second = stime.Seconds;
+  osMutexRelease(mutexSysMyTime_id);
+
+  uint32_t epoch = datetime_since_epoch(&sysMyTime);
   SysSettings[R34_SYS_TIME_RL] = (uint16_t)(epoch & 0xFFFF);
   SysSettings[R35_SYS_TIME_RH] = (uint16_t)(epoch >> 16);
 #if 0
