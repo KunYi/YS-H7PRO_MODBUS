@@ -3,7 +3,7 @@
 #include "debug.h"
 #include "sysSettings.h"
 #include "swTimer.h"
-#include "TowerOp.h"
+#include "towerProc.h"
 #include "sysIO.h"
 
 enum TOWER_STATE_MACHINE {
@@ -43,6 +43,10 @@ static int8_t getNextTower(uint8_t n) {
             return i;
     }
     return -1;
+}
+
+void initTowerProc(void) {
+  towerState = TOWER_OPERATION_INIT;
 }
 
 void TowerProc(void)

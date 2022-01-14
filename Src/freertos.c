@@ -31,7 +31,8 @@
 #include "debug.h"
 #include "mytime.h"
 #include "swTimer.h"
-#include "TowerOp.h"
+#include "towerProc.h"
+#include "cleanProc.h"
 #include "sysIO.h"
 /* USER CODE END Includes */
 
@@ -197,10 +198,14 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
+  initTowerProc();
+  initCleanProc();
+
   /* Infinite loop */
   for(;;)
   {
     TowerProc();
+    CleanProc();
     osDelay(10);
   }
   /* USER CODE END StartDefaultTask */
@@ -223,4 +228,3 @@ void StartDbgTask(void *argument)
   }
 }
 /* USER CODE END Application */
-

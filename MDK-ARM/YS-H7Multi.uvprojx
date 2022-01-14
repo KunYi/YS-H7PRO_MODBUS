@@ -394,6 +394,21 @@
           <GroupName>Application/User</GroupName>
           <Files>
             <File>
+              <FileName>cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\cfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>towerProc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\towerProc.c</FilePath>
+            </File>
+            <File>
+              <FileName>cleanProc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\cleanProc.c</FilePath>
+            </File>
+            <File>
               <FileName>mb_app.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\mb_app.c</FilePath>
@@ -505,19 +520,9 @@
               <FilePath>../Src/stm32h7xx_hal_timebase_tim.c</FilePath>
             </File>
             <File>
-              <FileName>cfg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\cfg.c</FilePath>
-            </File>
-            <File>
               <FileName>swTimer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\swTimer.c</FilePath>
-            </File>
-            <File>
-              <FileName>TowerOp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\TowerOp.c</FilePath>
             </File>
             <File>
               <FileName>sysIO.c</FileName>

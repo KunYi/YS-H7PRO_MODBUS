@@ -111,10 +111,15 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Src/SysIO.c</locationURI>
 		</link>
 		<link>
-			<name>Application/User/TowerOp.c</name>
+			<name>Application/User/towerProc.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Src/TowerOp.c</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/towerProc.c</locationURI>
 		</link>
+		<link>
+			<name>Application/User/cleanPoc.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Src/cleanProc.c</locationURI>
+		</link>		
 		<link>
 			<name>Drivers/CMSIS/system_stm32h7xx.c</name>
 			<type>1</type>
