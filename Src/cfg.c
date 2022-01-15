@@ -112,7 +112,7 @@ void saveCFG(struct CFG *cfg)
         .TypeErase = FLASH_TYPEERASE_SECTORS,
         .VoltageRange = FLASH_VOLTAGE_RANGE_3, /* write 32bits once */
         .Banks = 1,
-        .Sector = FLASH_SECTOR_1,
+        .Sector = CFG_SECTOR,
         .NbSectors = 1
     };
 

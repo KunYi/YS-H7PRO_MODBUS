@@ -31,31 +31,37 @@ struct UploadOperationData {
   uint32_t  waitMinuteCounter;
 };
 
-static int IsPowerOff(void);
 void InitMbIoT(void);
 void modbusIoTProc(void);
 
 static enum UPLOAD_STATE_MACHINE upState;
 static struct UploadOperationData upData;
 
-static int IsPowerOff(void)
+static int IsPowerOffTime(void)
 {
-  const uint8_t PowerOffHour = SysSettings[R54_NBIOT_POWEROFF_TIME] / 100;
+  struct MYTIME d;
+  const uint8_t powerOffHour = SysSettings[R54_NBIOT_POWEROFF_TIME] / 100;
   const uint8_t powerOffMinute = SysSettings[R54_NBIOT_POWEROFF_TIME] % 100;
+
+  getSysMyTime(&d);
+  if ((d.hour == powerOffHour) && (d.minute == powerOffMinute)) {
+    return 1;
+  }
   return 0;
 }
 
 void modbusIoTProc(void) {
-  if (upData.waitMinuteCounter != getTimeMinuteCount()) {
-    upData.waitMinuteCounter = getTimeMinuteCount();
-    if (IsPowerOff()) {
-      upState = TURN_OFF_POWER;
-    }
-  }
-
   if (SysSettings[R36_RUN_MODE] != MODE_RUNNING) {
       upState = UPLOAD_OPERATION_INIT;
       return;
+  }
+
+  if (upData.waitMinuteCounter != getTimeMinuteCount()) {
+    upData.waitMinuteCounter = getTimeMinuteCount();
+    if (IsPowerOffTime()) {
+      upData.waitSecondCounter = getTimeCount();
+      upState = TURN_OFF_POWER;
+    }
   }
 
   switch(upState) {
@@ -88,7 +94,7 @@ void modbusIoTProc(void) {
     break;
 
   case TURN_OFF_POWER:
-    if ((getTimeCount() - upData.waitSecondCounter) >= UPLOAD_PERIOD) {
+    if ((getTimeCount() - upData.waitSecondCounter) >= TURNOFF_TIME) {
       upState = FIRST_UPDATE;
       NBIOT_ON_CTRL = TURN_ON_NBIOT;
     }
@@ -115,6 +121,6 @@ void InitMbIoT(void)
   //Start capturing traffic on serial Port
   ModbusStart(&MBIoTH);
   upState = UPLOAD_OPERATION_INIT;
-  upData.waitSecondCounter = getTimeCount();
-  upData.waitMinuteCounter = getTimeMinuteCount();
+  upData.waitSecondCounter = 0;
+  upData.waitMinuteCounter = 0;
 }

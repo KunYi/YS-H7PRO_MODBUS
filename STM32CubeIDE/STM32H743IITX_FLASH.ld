@@ -172,7 +172,7 @@ SECTIONS
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
   
-  .fw_info 0x801FF00 :
+  .fw_info 0x801FC00 :
   {
       . = ALIGN(8);
 	  KEEP(*(.fw_info))

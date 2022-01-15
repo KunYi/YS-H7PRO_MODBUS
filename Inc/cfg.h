@@ -42,4 +42,5 @@ void checkAndLoadCfg(void);
 void updateAndSaveCfg(void);
 
 #define CFG_ADDRESS         ((uint32_t) 0x08020000)    /* SECTOR 1 */
+#define CFG_SECTOR          (FLASH_SECTOR_1)
 #endif /* end of file __CFG_H__ */

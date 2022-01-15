@@ -7,8 +7,7 @@
 #include <string.h>
 
 #include "rtc.h"
-#include "SEGGER_RTT.h"
-#include "mytime.h"
+#include "debug.h"
 #include "swTimer.h"
 #include "sysSettings.h"
 
@@ -52,20 +51,21 @@ void basic1SecCallback(void *argument)
     don't change GetTime & GetDate sequence
     STM32 need keep the operation order for RTC
   */
+  osMutexAcquire(mutexSysMyTime_id, osWaitForever);
   HAL_RTC_GetTime(&hrtc, &stime, RTC_FORMAT_BIN);
   HAL_RTC_GetDate(&hrtc, &sdate, RTC_FORMAT_BIN);
 
-  osMutexAcquire(mutexSysMyTime_id, osWaitForever);
   sysMyTime.year = sdate.Year + 2000;
   sysMyTime.month = sdate.Month;
   sysMyTime.day = sdate.Date;
   sysMyTime.minute = stime.Minutes;
   sysMyTime.second = stime.Seconds;
-  osMutexRelease(mutexSysMyTime_id);
+
 
   uint32_t epoch = datetime_since_epoch(&sysMyTime);
   SysSettings[R34_SYS_TIME_RL] = (uint16_t)(epoch & 0xFFFF);
   SysSettings[R35_SYS_TIME_RH] = (uint16_t)(epoch >> 16);
+  osMutexRelease(mutexSysMyTime_id);
 #if 0
   if ((count % 10) == 0) {
     SEGGER_RTT_printf(0, "current date:time %0.2d/%0.2d/%0.4d, ", sdate.Month, sdate.Date, sdate.Year + 2000);

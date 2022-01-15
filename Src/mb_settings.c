@@ -67,13 +67,16 @@ static void syncRTCTime(const int32_t val) {
   HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 }
 
+extern osMutexId_t mutexSysMyTime_id;
 static void checkAndUpdateSysTime(void) {
   uint32_t valNew = MBSettingsH.u16regs[R57_SYS_TIME_WH] * 65536 +  MBSettingsH.u16regs[R56_SYS_TIME_WL];
 
   if (valNew != 0) {
+    osMutexAcquire(mutexSysMyTime_id, osWaitForever);
     SysSettings[R34_SYS_TIME_RL] = MBSettingsH.u16regs[R56_SYS_TIME_WL];
     SysSettings[R35_SYS_TIME_RH] = MBSettingsH.u16regs[R57_SYS_TIME_WH];
     syncRTCTime(valNew);
+    osMutexRelease(mutexSysMyTime_id);
   }
 }
 
