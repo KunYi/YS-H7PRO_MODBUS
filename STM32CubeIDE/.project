@@ -36,6 +36,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/YS-H7Multi.ioc</locationURI>
 		</link>
 		<link>
+			<name>BSP/keyProc.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/BSP/keyProc.c</locationURI>
+		</link>
+		<link>
 			<name>Application/User/SysIO.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Src/SysIO.c</locationURI>

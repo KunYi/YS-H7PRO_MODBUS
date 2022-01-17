@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "rtc.h"
+#include "keyProc.h"
 #include "debug.h"
 #include "mytime.h"
 #include "swTimer.h"
@@ -206,6 +207,7 @@ void StartDefaultTask(void *argument)
     TowerProc();
     CleanProc();
     modbusIoTProc();
+    keyProc();
     osDelay(10);
   }
   /* USER CODE END StartDefaultTask */
