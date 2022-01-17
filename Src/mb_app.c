@@ -12,19 +12,16 @@
 #include "Modbus.h"
 #include "sysStatus.h"
 #include "sysSettings.h"
+#include "sysIO.h"
 #include "debug.h"
 #include "defaultConfig.h"
 
 modbusHandler_t ModbusMasterH;
-uint8_t         ModbusSlaveCoilBuffer[10];
-uint16_t        ModusSlaveDataBuffer[48];
-uint16_t        SysStatus[48];
 uint16_t        u16EC;
 uint16_t        u16PH;
 uint16_t        u16Temp1Array[4];
 uint16_t        u16Temp2Array[4];
 uint16_t        u16DIO;
-struct SystemStatus*  pSysStatus=(struct SystemStatus*)SysStatus;
 
 void InitMbReadSensors(void);
 static void MbReadSensorsProc(void);
@@ -56,7 +53,7 @@ static void MbReadSensorsProc(void) {
     INFO_PRINTF(RTT_CTRL_RESET);
   } else {
     DEBUG_PRINTF("read EC:0x%04X(%d)\r\n", u16EC, u16EC);
-    pSysStatus->EC = u16EC;
+    SysSettings[R03_EC] = u16EC;
   }
   osDelay(1);
 
@@ -73,7 +70,7 @@ static void MbReadSensorsProc(void) {
     INFO_PRINTF(RTT_CTRL_RESET);
   } else {
     DEBUG_PRINTF("read PH:0x%04X(%d)\r\n", u16PH, u16PH);
-    pSysStatus->PH = u16PH;
+    SysSettings[R04_PH] = u16PH;
   }
   osDelay(1);
 
@@ -91,10 +88,10 @@ static void MbReadSensorsProc(void) {
   } else {
     DEBUG_PRINTF("read Temp1 ch0:%d ch1:%d ch2:%d ch3:%d\r\n",
     u16Temp1Array[0], u16Temp1Array[1], u16Temp1Array[2], u16Temp1Array[3]);
-    pSysStatus->TempIn1 = u16Temp1Array[0];
-    pSysStatus->TempOutput1 = u16Temp1Array[1];
-    pSysStatus->TempIn2 = u16Temp1Array[2];
-    pSysStatus->TempOutput2 = u16Temp1Array[2];
+    SysSettings[R01_TEMP1_IN] = u16Temp1Array[0];
+    SysSettings[R02_TEMP1_OUT] = u16Temp1Array[1];
+    SysSettings[R07_TEMP2_IN] = u16Temp1Array[2];
+    SysSettings[R08_TEMP2_OUT] = u16Temp1Array[3];
   }
   osDelay(1);
 
@@ -112,20 +109,20 @@ static void MbReadSensorsProc(void) {
   } else {
     DEBUG_PRINTF("read Temp2 ch0:%d ch1:%d ch2:%d ch3:%d\r\n",
     u16Temp2Array[0], u16Temp2Array[1], u16Temp2Array[2], u16Temp2Array[3]);
-    pSysStatus->TempIn3 = u16Temp2Array[0];
-    pSysStatus->TempOutput3 = u16Temp2Array[1];
-    pSysStatus->TempIn4 = u16Temp2Array[2];
-    pSysStatus->TempOutput4 = u16Temp2Array[2];
+    SysSettings[R09_TEMP3_IN] = u16Temp1Array[0];
+    SysSettings[R10_TEMP3_OUT] = u16Temp1Array[1];
+    SysSettings[R11_TEMP4_IN] = u16Temp1Array[2];
+    SysSettings[R12_TEMP4_OUT] = u16Temp1Array[3];
   }
   osDelay(1);
 
+  u16DIO = sysOut._out;
   telegram.u8id = MB_DIO;
   telegram.u8fct = MB_FC_WRITE_REGISTER; // function code
   telegram.u16RegAdd = 0;
   telegram.u16CoilsNo = 1;
   telegram.u16reg = &u16DIO;
   ModbusQuery(&ModbusMasterH, telegram);
-  u16DIO++;
   u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
   if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
     // error handler
@@ -133,6 +130,24 @@ static void MbReadSensorsProc(void) {
     INFO_PRINTF(RTT_CTRL_RESET);
   } else {
     DEBUG_PRINTF(0, "write DIO:%04X(%03d)\r\n", u16DIO, u16DIO);
+  }
+  osDelay(1);
+
+  telegram.u8id = MB_DIO;
+  telegram.u8fct = MB_FC_READ_REGISTERS; // function code
+  telegram.u16RegAdd = 0x04;
+  telegram.u16CoilsNo = 1;
+  telegram.u16reg = &u16DIO;
+  ModbusQuery(&ModbusMasterH, telegram);
+  u16DIO++;
+  u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+  if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
+    // error handler
+    INFO_PRINTF(RTT_CTRL_TEXT_BRIGHT_RED "read DIO failed\r\n");
+    INFO_PRINTF(RTT_CTRL_RESET);
+  } else {
+    DEBUG_PRINTF(0, "read DIO:%04X(%03d)\r\n", u16DIO, u16DIO);
+    sysIn._in = (u16DIO & 0xFF);
   }
 }
 
