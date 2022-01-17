@@ -122,6 +122,7 @@ int main(void)
   ModbusInitVar();
   initSwTimer();
   initSysIO();
+  initKey();
   checkAndLoadCfg();
 
   DEBUG_PRINTF(RTT_CTRL_CLEAR RTT_CTRL_RESET);
