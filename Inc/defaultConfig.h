@@ -31,4 +31,6 @@
 #define SENSOR_TEMP2           (4)
 
 #define MB_DIO                 (20)
+
+#define MB_NBIOT               (1)
 #endif /* end of __DEFAULT_CONF_H */

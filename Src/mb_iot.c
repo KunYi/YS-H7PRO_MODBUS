@@ -14,8 +14,10 @@
 #include "debug.h"
 #include "defaultConfig.h"
 
+#define NBIOT_MAX_REGISTERS   (48)
+#define SUPPORT_UPDATE_REGISTERS (23)
 static modbusHandler_t MBIoTH;
-static uint16_t        mbIoTDataBuffer[48];
+static uint16_t        mbIoTDataBuffer[NBIOT_MAX_REGISTERS];
 
 enum UPLOAD_STATE_MACHINE {
   UPLOAD_OPERATION_INIT,
@@ -23,6 +25,7 @@ enum UPLOAD_STATE_MACHINE {
   UPLOAD_IDLE_DATA,
   UPLOAD_DATA,
   TEST_UPLOAD_DATA,
+  WAIT_UPDATA,
   TURN_OFF_POWER,
 };
 
@@ -36,6 +39,20 @@ void modbusIoTProc(void);
 
 static enum UPLOAD_STATE_MACHINE upState;
 static struct UploadOperationData upData;
+
+static void updateDataToNBIOT(void)
+{
+  modbus_t telegram;
+  telegram.u8id = MB_NBIOT; // slave address
+  telegram.u8fct = MB_FC_WRITE_MULTIPLE_REGISTERS; // function code 03, only support the code
+  telegram.u16RegAdd = 0; // start address in slave, 40001
+  telegram.u16CoilsNo = NBIOT_MAX_REGISTERS; // number of elements (coils or registers) to read
+  telegram.u16reg = mbIoTDataBuffer; // pointer to a memory array in the Arduino
+  for (int i = 0; i < SUPPORT_UPDATE_REGISTERS; i++) {
+    mbIoTDataBuffer[i] = SysSettings[i];
+  }
+  ModbusQuery(&MBIoTH, telegram);
+}
 
 static int IsPowerOffTime(void)
 {
@@ -84,13 +101,26 @@ void modbusIoTProc(void) {
     break;
 
   case UPLOAD_DATA:
-    upState = UPLOAD_IDLE_DATA;
+    upState = WAIT_UPDATA;
     upData.waitSecondCounter = getTimeCount();
+    updateDataToNBIOT();
     break;
 
   case TEST_UPLOAD_DATA:
-    upState = UPLOAD_IDLE_DATA;
+    upState = WAIT_UPDATA;
     upData.waitSecondCounter = getTimeCount();
+    updateDataToNBIOT();
+    break;
+
+  case WAIT_UPDATA:
+    if (MBIoTH.i8state == COM_IDLE) {
+      ulTaskNotifyTake(pdTRUE, 1000); // for clean notify
+      if (MBIoTH.i8lastError != 0)
+        DEBUG_PRINTF("Update to NBIOT Gateway failed\n");
+
+      upState = UPLOAD_IDLE_DATA;
+      upData.waitSecondCounter = getTimeCount();
+    }
     break;
 
   case TURN_OFF_POWER:
@@ -104,6 +134,7 @@ void modbusIoTProc(void) {
 
 void InitMbIoT(void)
 {
+  memset(mbIoTDataBuffer, 0, sizeof(mbIoTDataBuffer));
   MBIoTH.uModbusType = MB_MASTER;
   MBIoTH.xTypeHW = USART_HW;
   MBIoTH.port = &MODBUS_IOT_UART;
@@ -114,7 +145,7 @@ void InitMbIoT(void)
   MBIoTH.u8coilsmask = NULL;
   MBIoTH.u16coilsize = 0;
   MBIoTH.u16regs = mbIoTDataBuffer;
-  MBIoTH.u16regsize = sizeof(mbIoTDataBuffer)/sizeof(uint16_t);
+  MBIoTH.u16regsize = NBIOT_MAX_REGISTERS;
   MBIoTH.u8regsmask = NULL;
   //Initialize Modbus library
   ModbusInit(&MBIoTH);
