@@ -69,6 +69,6 @@ void keyProc(void) {
     gpioKeyProc(&keyState[3], KEY4_GPIO_Port, KEY4_Pin);
 }
 
-void initKey(void) {
+void initKeyProc(void) {
     memset(keyState, 0, sizeof(keyState));
 }

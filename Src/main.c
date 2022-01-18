@@ -31,6 +31,7 @@
 #include "Modbus.h"
 #include "swTimer.h"
 #include "sysIO.h"
+#include "keyProc.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -122,7 +123,7 @@ int main(void)
   ModbusInitVar();
   initSwTimer();
   initSysIO();
-  initKey();
+  initKeyProc();
   checkAndLoadCfg();
 
   DEBUG_PRINTF(RTT_CTRL_CLEAR RTT_CTRL_RESET);
