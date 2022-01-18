@@ -40,6 +40,11 @@ void modbusIoTProc(void);
 static enum UPLOAD_STATE_MACHINE upState;
 static struct UploadOperationData upData;
 
+static bool isTestNBIoT(void)
+{
+  return ((SysStatus[R55_FIELD_MASK] & ( 1<< 1)) != 0);
+}
+
 static void updateDataToNBIOT(void)
 {
   modbus_t telegram;
@@ -49,7 +54,7 @@ static void updateDataToNBIOT(void)
   telegram.u16CoilsNo = NBIOT_MAX_REGISTERS; // number of elements (coils or registers) to read
   telegram.u16reg = mbIoTDataBuffer; // pointer to a memory array in the Arduino
   for (int i = 0; i < SUPPORT_UPDATE_REGISTERS; i++) {
-    mbIoTDataBuffer[i] = SysSettings[i];
+    mbIoTDataBuffer[i] = SysStatus[i];
   }
   ModbusQuery(&MBIoTH, telegram);
 }
@@ -57,8 +62,8 @@ static void updateDataToNBIOT(void)
 static int IsPowerOffTime(void)
 {
   struct MYTIME d;
-  const uint8_t powerOffHour = SysSettings[R54_NBIOT_POWEROFF_TIME] / 100;
-  const uint8_t powerOffMinute = SysSettings[R54_NBIOT_POWEROFF_TIME] % 100;
+  const uint8_t powerOffHour = SysStatus[R54_NBIOT_POWEROFF_TIME] / 100;
+  const uint8_t powerOffMinute = SysStatus[R54_NBIOT_POWEROFF_TIME] % 100;
 
   getSysMyTime(&d);
   if ((d.hour == powerOffHour) && (d.minute == powerOffMinute)) {
@@ -68,7 +73,7 @@ static int IsPowerOffTime(void)
 }
 
 void modbusIoTProc(void) {
-  if (SysSettings[R36_RUN_MODE] != MODE_RUNNING) {
+  if (SysStatus[R36_RUN_MODE] != MODE_RUNNING) {
       upState = UPLOAD_OPERATION_INIT;
       return;
   }
@@ -97,6 +102,11 @@ void modbusIoTProc(void) {
   case UPLOAD_IDLE_DATA:
     if ((getTimeCount() - upData.waitSecondCounter) >= UPLOAD_PERIOD) {
       upState = UPLOAD_DATA;
+    } else {
+      if (isTestNBIoT()) {
+        DEBUG_PRINTF("To Update NBIOT data\n");
+        upState = TEST_UPLOAD_DATA;
+      }
     }
     break;
 

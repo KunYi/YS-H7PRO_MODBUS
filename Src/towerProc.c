@@ -26,13 +26,15 @@ struct TowerOperationData {
 
 enum TOWER_STATE_MACHINE towerState;
 static struct TowerOperationData towerData;
+static uint8_t isRunning;
 
 uint32_t dbgCount = 0;
-#define SIMULATION_IO_AUTO  1
+#define SIMULATION_FLOW_ON        1
+#define SIMULATION_PUMP_ON        1
 
 static int isEnabledTowerX(uint8_t num)
 {
-  return ((SysSettings[R37_TOWER_ENABLED] & (1 << num)) != 0);
+  return ((SysStatus[R37_TOWER_ENABLED] & (1 << num)) != 0);
 }
 
 static int8_t getNextTower(uint8_t n) {
@@ -55,16 +57,21 @@ static void initOutput(void)
 }
 
 void initTowerProc(void) {
+  isRunning = 0;
   towerState = TOWER_OPERATION_INIT;
   initOutput();
 }
 
 void TowerProc(void)
 {
-  if (SysSettings[R36_RUN_MODE] != MODE_RUNNING) {
+  if (SysStatus[R36_RUN_MODE] != MODE_RUNNING) {
       towerState = TOWER_OPERATION_INIT;
-      SysSettings[R22_OP_TOWER_NUM] = 0;
-      SysSettings[R23_OP_MINUTE] = 0;
+      SysStatus[R22_OP_TOWER_NUM] = 0;
+      SysStatus[R23_OP_MINUTE] = 0;
+      if (isRunning) {
+        initOutput();
+        isRunning = 0;
+      }
       return;
   }
 
@@ -74,10 +81,11 @@ void TowerProc(void)
     towerState = SELECT_TOWER;
     memset(&towerData, 0, sizeof(struct TowerOperationData));
     towerData.currentTower = -1;
-    SysSettings[R22_OP_TOWER_NUM] = 0;
-    SysSettings[R23_OP_MINUTE] = 0;
-    SysSettings[R30_PUMP_NOWATER] = 0;
-    SysSettings[R31_PUMP_COOLDOWN] = 0;
+    SysStatus[R22_OP_TOWER_NUM] = 0;
+    SysStatus[R23_OP_MINUTE] = 0;
+    SysStatus[R30_PUMP_NOWATER] = 0;
+    SysStatus[R31_PUMP_COOLDOWN] = 0;
+    isRunning = 1;
     initOutput();
 
   case SELECT_TOWER:
@@ -98,10 +106,10 @@ void TowerProc(void)
       sysTurnOnTower(towerData.currentTower);
       PUMP_ON_CTRL = TURN_ON_PUMP;
 
-      SysSettings[R30_PUMP_NOWATER] = 0;
-      SysSettings[R31_PUMP_COOLDOWN] = 0;
-      SysSettings[R23_OP_MINUTE] = 0;
-      SysSettings[R22_OP_TOWER_NUM] =  (towerData.currentTower + 1);
+      SysStatus[R30_PUMP_NOWATER] = 0;
+      SysStatus[R31_PUMP_COOLDOWN] = 0;
+      SysStatus[R23_OP_MINUTE] = 0;
+      SysStatus[R22_OP_TOWER_NUM] =  (towerData.currentTower + 1);
 
       dbgCount = 0;
     break;
@@ -112,8 +120,8 @@ void TowerProc(void)
       towerState = CHECK_FLOW_ACTIVE;
       towerData.waitCounter = getTimeCount(); /* for Pump Protect */
     }
-    #ifdef SIMULATION_IO_AUTO
-    if (dbgCount++ > 200) {
+    #ifdef SIMULATION_PUMP_ON
+    if (dbgCount++ > 500) {
       DEBUG_PRINTF("Simulation to CHECK_FLOW_ACTIVE\n");
       towerState = CHECK_FLOW_ACTIVE;
       dbgCount = 0;
@@ -131,20 +139,20 @@ void TowerProc(void)
       towerData.waitCounter = getTimeCount(); // for running time
     }
     /* check no water flow over pumpNoWaterTime */
-    if (SysSettings[R30_PUMP_NOWATER] != (getTimeCount() - towerData.waitCounter)) {
-      SysSettings[R30_PUMP_NOWATER] = (getTimeCount() - towerData.waitCounter);
+    if (SysStatus[R30_PUMP_NOWATER] != (getTimeCount() - towerData.waitCounter)) {
+      SysStatus[R30_PUMP_NOWATER] = (getTimeCount() - towerData.waitCounter);
       DEBUG_PRINTF("CHECK_FLOW_ACTIVE towerId:%d\n", towerData.currentTower);
-      DEBUG_PRINTF("No Water, how long:%d sec\n", SysSettings[R30_PUMP_NOWATER]);
+      DEBUG_PRINTF("No Water, how long:%d sec\n", SysStatus[R30_PUMP_NOWATER]);
     }
-    SysSettings[R30_PUMP_NOWATER] = (getTimeCount() - towerData.waitCounter);
-    if (SysSettings[R30_PUMP_NOWATER] >= SysSettings[R46_PUMP_NOWATER_TIME]) {
+    SysStatus[R30_PUMP_NOWATER] = (getTimeCount() - towerData.waitCounter);
+    if (SysStatus[R30_PUMP_NOWATER] >= SysStatus[R46_PUMP_NOWATER_TIME]) {
       DEBUG_PRINTF("TRANSTION to WAIT_PUMP_COOLDOWN\n");
       towerState = WAIT_PUMP_COOLDOWN;
       PUMP_ON_CTRL = TURN_OFF_PUMP;
       towerData.waitCounter = getTimeCount(); /* for Pump cool down */
     }
-    #ifdef SIMULATION_IO_AUTO
-    if (dbgCount++ > 3000) {
+    #ifdef SIMULATION_FLOW_ON
+    if (dbgCount++ > 500) {
       DEBUG_PRINTF("Simulation to TOWER_RUNNING\n");
       towerState = TOWER_RUNNING;
       dbgCount = 0;
@@ -154,21 +162,24 @@ void TowerProc(void)
     break;
 
   case WAIT_PUMP_COOLDOWN:
-    if (SysSettings[R31_PUMP_COOLDOWN] != (getTimeCount() - towerData.waitCounter)) {
-      SysSettings[R31_PUMP_COOLDOWN] = getTimeCount() - towerData.waitCounter;
-      DEBUG_PRINTF("WAIT_PUMP_COOLDOWN, how long:%d sec\n", SysSettings[R31_PUMP_COOLDOWN]);
+    if (SysStatus[R31_PUMP_COOLDOWN] != (getTimeCount() - towerData.waitCounter)) {
+      SysStatus[R31_PUMP_COOLDOWN] = getTimeCount() - towerData.waitCounter;
+      DEBUG_PRINTF("WAIT_PUMP_COOLDOWN, how long:%d sec\n", SysStatus[R31_PUMP_COOLDOWN]);
     }
 
-    if (SysSettings[R31_PUMP_COOLDOWN] >= SysSettings[R47_PUMP_COOLDOWN_TIME]) {
+    if (SysStatus[R31_PUMP_COOLDOWN] >= SysStatus[R47_PUMP_COOLDOWN_TIME]) {
       if (TOWER_MAX_RETRY > ++towerData.retryCounter)
       {
         DEBUG_PRINTF("WAIT_PUMP_COOLDOWN, retry:%d, TRANSTION to ENABLE_TOWER\n", towerData.retryCounter);
         towerState = ENABLE_TOWER;
+        sysTurnOffTower(towerData.currentTower);
       }
       else {
         if (MAX_FAILED_CONTINUE_TOWER > ++towerData.continueTowerFailed) {
           DEBUG_PRINTF("WAIT_PUMP_COOLDOWN, TRANSTION to SELECT_TOWER, continueTowerFailed: %d\n", towerData.continueTowerFailed);
           towerState = SELECT_TOWER;
+          PUMP_ON_CTRL = TURN_OFF_PUMP;
+          sysTurnOffTower(towerData.currentTower);
         }
         else {
           DEBUG_PRINTF("WAIT_PUMP_COOLDOWN, TRANSTION to ERROR_STOP, continueTowerFailed: %d\n", towerData.continueTowerFailed);
@@ -179,12 +190,12 @@ void TowerProc(void)
     break;
 
   case TOWER_RUNNING:
-    if (SysSettings[R23_OP_MINUTE] != (getTimeCount() - towerData.waitCounter) / 60) {
-      SysSettings[R23_OP_MINUTE] = (getTimeCount() - towerData.waitCounter) / 60;
-      DEBUG_PRINTF("TOWER_RUNNING, how long:%d minute\n", SysSettings[R23_OP_MINUTE]);
+    if (SysStatus[R23_OP_MINUTE] != (getTimeCount() - towerData.waitCounter) / 60) {
+      SysStatus[R23_OP_MINUTE] = (getTimeCount() - towerData.waitCounter) / 60;
+      DEBUG_PRINTF("TOWER_RUNNING, how long:%d minute\n", SysStatus[R23_OP_MINUTE]);
     }
 
-    if (SysSettings[R23_OP_MINUTE] >= SysSettings[R38_TOWER1_TIME + towerData.currentTower]) {
+    if (SysStatus[R23_OP_MINUTE] >= SysStatus[R38_TOWER1_TIME + towerData.currentTower]) {
       towerState = SELECT_TOWER;
       DEBUG_PRINTF("Finish TOWER_RUNNING, TRASNSTION to SELECT_TOWER\n");
       PUMP_ON_CTRL = TURN_OFF_PUMP;
@@ -195,7 +206,7 @@ void TowerProc(void)
   case ERROR_STOP:
     initOutput();
     ELECTRODE_ON_CTRL = TURN_ON_ELECTRODE;
-    SysSettings[R22_OP_TOWER_NUM] = 9;
+    SysStatus[R22_OP_TOWER_NUM] = 9;
     break;
   } /* end of switch(towerState) */
 

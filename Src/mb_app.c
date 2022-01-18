@@ -38,7 +38,7 @@ void StartMbReadSensorsTask(void *argument)
 
 static bool isCoTemp(void)
 {
-  return ((SysSettings[R55_FIELD_MASK] & (1 << 0)) != 0);
+  return ((SysStatus[R55_FIELD_MASK] & (1 << 0)) != 0);
 }
 
 static void readEC(void)
@@ -59,7 +59,7 @@ static void readEC(void)
     INFO_PRINTF(RTT_CTRL_RESET);
   } else {
     DEBUG_PRINTF("read EC:0x%04X(%d)\r\n", u16EC, u16EC);
-    SysSettings[R03_EC] = u16EC;
+    SysStatus[R03_EC] = u16EC;
   }
 }
 
@@ -81,7 +81,7 @@ static void readPH(void)
     INFO_PRINTF(RTT_CTRL_RESET);
   } else {
     DEBUG_PRINTF("read PH:0x%04X(%d)\r\n", u16PH, u16PH);
-    SysSettings[R04_PH] = u16PH;
+    SysStatus[R04_PH] = u16PH;
   }
 }
 
@@ -106,22 +106,22 @@ static void readTemp(void)
   else {
     DEBUG_PRINTF("read Temp1 ch0:%d ch1:%d ch2:%d ch3:%d\n",
     u16Temp1Array[0], u16Temp1Array[1], u16Temp1Array[2], u16Temp1Array[3]);
-    SysSettings[R01_TEMP1_IN] = u16Temp1Array[0];
-    SysSettings[R02_TEMP1_OUT] = u16Temp1Array[1];
+    SysStatus[R01_TEMP1_IN] = u16Temp1Array[0];
+    SysStatus[R02_TEMP1_OUT] = u16Temp1Array[1];
     if (coTempSensors) {
-      SysSettings[R07_TEMP2_IN] = u16Temp1Array[0];
-      SysSettings[R08_TEMP2_OUT] = u16Temp1Array[1];
+      SysStatus[R07_TEMP2_IN] = u16Temp1Array[0];
+      SysStatus[R08_TEMP2_OUT] = u16Temp1Array[1];
     } else {
-      SysSettings[R07_TEMP2_IN] = u16Temp1Array[2];
-      SysSettings[R08_TEMP2_OUT] = u16Temp1Array[3];
+      SysStatus[R07_TEMP2_IN] = u16Temp1Array[2];
+      SysStatus[R08_TEMP2_OUT] = u16Temp1Array[3];
     }
   }
 
   if (coTempSensors) {
-      SysSettings[R09_TEMP3_IN] = u16Temp1Array[0];
-      SysSettings[R10_TEMP3_OUT] = u16Temp1Array[1];
-      SysSettings[R11_TEMP4_IN] = u16Temp1Array[0];
-      SysSettings[R12_TEMP4_OUT] = u16Temp1Array[1];
+      SysStatus[R09_TEMP3_IN] = u16Temp1Array[0];
+      SysStatus[R10_TEMP3_OUT] = u16Temp1Array[1];
+      SysStatus[R11_TEMP4_IN] = u16Temp1Array[0];
+      SysStatus[R12_TEMP4_OUT] = u16Temp1Array[1];
   }
   else {
     telegram.u8id = SENSOR_TEMP2;
@@ -138,10 +138,10 @@ static void readTemp(void)
     } else {
       DEBUG_PRINTF("read Temp2 ch0:%d ch1:%d ch2:%d ch3:%d\r\n",
       u16Temp2Array[0], u16Temp2Array[1], u16Temp2Array[2], u16Temp2Array[3]);
-      SysSettings[R09_TEMP3_IN] = u16Temp1Array[0];
-      SysSettings[R10_TEMP3_OUT] = u16Temp1Array[1];
-      SysSettings[R11_TEMP4_IN] = u16Temp1Array[2];
-      SysSettings[R12_TEMP4_OUT] = u16Temp1Array[3];
+      SysStatus[R09_TEMP3_IN] = u16Temp1Array[0];
+      SysStatus[R10_TEMP3_OUT] = u16Temp1Array[1];
+      SysStatus[R11_TEMP4_IN] = u16Temp1Array[2];
+      SysStatus[R12_TEMP4_OUT] = u16Temp1Array[3];
     }
   }
 }
@@ -188,6 +188,7 @@ static void GetDI(void)
   } else {
     DEBUG_PRINTF("read DIO:0x%04X\n", u16DIO);
     sysIn._in = (u16DIO & 0xFF);
+    SysStatus[R24_DIGITAL_INPUT] = u16DIO;
   }
 }
 

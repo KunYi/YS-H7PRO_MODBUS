@@ -35,16 +35,16 @@ void saveInitCFG(void)
     saveCFG(&defCfg);
 }
 
-static void initSysSettings(void) {
+static void initSysStatus(void) {
   for (int i = 0; i < MAX_SETTINGS_REG; i++)
-	  SysSettings[i] = 0;
+	  SysStatus[i] = 0;
 }
 
 void checkAndLoadCfg(void)
 {
   struct CFG sysCfg;
 
-  initSysSettings();
+  initSysStatus();
   readCFG(&sysCfg);
   // for default value when config is empty
   if (sysCfg.magicMark != CFG_MAGIC) {
@@ -56,25 +56,25 @@ void checkAndLoadCfg(void)
   }
 
   // restore to SysSettings
-  SysSettings[R00_TOWER_ID] = sysCfg.towerID;
-  SysSettings[R36_RUN_MODE] = sysCfg.runMode;
-  SysSettings[R37_TOWER_ENABLED] = sysCfg.towersEnabled;
+  SysStatus[R00_TOWER_ID] = sysCfg.towerID;
+  SysStatus[R36_RUN_MODE] = sysCfg.runMode;
+  SysStatus[R37_TOWER_ENABLED] = sysCfg.towersEnabled;
 
   for (int i = 0; i < 8; i++) {
-    SysSettings[R38_TOWER1_TIME + i] = sysCfg.towerTime[i];
+    SysStatus[R38_TOWER1_TIME + i] = sysCfg.towerTime[i];
   }
 
-  SysSettings[R29_VALVE_SWITCH_TIME] = sysCfg.valveSwitchTime;
-  SysSettings[R46_PUMP_NOWATER_TIME] = sysCfg.pumpNoWaterTime;
-  SysSettings[R47_PUMP_COOLDOWN_TIME] = sysCfg.pumpCoolDownTime;
-  SysSettings[R48_EC_TRIGGER] = sysCfg.triggerEC;
-  SysSettings[R49_PH_TRIGGER] = sysCfg.triggerPH;
-  SysSettings[R50_CLEANING_TIME] = sysCfg.cleaningTime;
-  SysSettings[R51_CLEANING_COOLDOWN_TIME] = sysCfg.cleaningCoolDownTime;
-  SysSettings[R52_SOURCE_FLOW_TIME] = sysCfg.sourceFlowTime;
-  SysSettings[R53_NBIOT_TIME] = sysCfg.nbIoTProcTime;
-  SysSettings[R54_NBIOT_POWEROFF_TIME] = sysCfg.nbIoTPowerOffTime;
-  SysSettings[R55_FIELD_MASK] = sysCfg.fieldMask;
+  SysStatus[R29_VALVE_SWITCH_TIME] = sysCfg.valveSwitchTime;
+  SysStatus[R46_PUMP_NOWATER_TIME] = sysCfg.pumpNoWaterTime;
+  SysStatus[R47_PUMP_COOLDOWN_TIME] = sysCfg.pumpCoolDownTime;
+  SysStatus[R48_EC_TRIGGER] = sysCfg.triggerEC;
+  SysStatus[R49_PH_TRIGGER] = sysCfg.triggerPH;
+  SysStatus[R50_CLEANING_TIME] = sysCfg.cleaningTime;
+  SysStatus[R51_CLEANING_COOLDOWN_TIME] = sysCfg.cleaningCoolDownTime;
+  SysStatus[R52_SOURCE_FLOW_TIME] = sysCfg.sourceFlowTime;
+  SysStatus[R53_NBIOT_TIME] = sysCfg.nbIoTProcTime;
+  SysStatus[R54_NBIOT_POWEROFF_TIME] = sysCfg.nbIoTPowerOffTime;
+  SysStatus[R55_FIELD_MASK] = sysCfg.fieldMask;
 }
 
 void updateAndSaveCfg(void)
@@ -82,25 +82,25 @@ void updateAndSaveCfg(void)
   struct CFG sysCfg;
   INIT_CFG(&sysCfg);
 
-  sysCfg.towerID = SysSettings[R00_TOWER_ID];
-  sysCfg.runMode = SysSettings[R36_RUN_MODE];
-  sysCfg.towersEnabled =  SysSettings[R37_TOWER_ENABLED];
+  sysCfg.towerID = SysStatus[R00_TOWER_ID];
+  sysCfg.runMode = SysStatus[R36_RUN_MODE];
+  sysCfg.towersEnabled =  SysStatus[R37_TOWER_ENABLED];
 
   for (int i = 0; i < 8; i++) {
-     sysCfg.towerTime[i] = SysSettings[R38_TOWER1_TIME + i];
+     sysCfg.towerTime[i] = SysStatus[R38_TOWER1_TIME + i];
   }
 
-  sysCfg.valveSwitchTime = SysSettings[R29_VALVE_SWITCH_TIME];
-  sysCfg.pumpNoWaterTime = SysSettings[R46_PUMP_NOWATER_TIME];
-  sysCfg.pumpCoolDownTime = SysSettings[R47_PUMP_COOLDOWN_TIME];
-  sysCfg.triggerEC = SysSettings[R48_EC_TRIGGER];
-  sysCfg.triggerPH = SysSettings[R49_PH_TRIGGER];
-  sysCfg.cleaningTime = SysSettings[R50_CLEANING_TIME];
-  sysCfg.cleaningCoolDownTime = SysSettings[R51_CLEANING_COOLDOWN_TIME];
-  sysCfg.sourceFlowTime = SysSettings[R52_SOURCE_FLOW_TIME];
-  sysCfg.nbIoTProcTime = SysSettings[R53_NBIOT_TIME];
-  sysCfg.nbIoTPowerOffTime = SysSettings[R54_NBIOT_POWEROFF_TIME];
-  sysCfg.fieldMask = SysSettings[R55_FIELD_MASK];
+  sysCfg.valveSwitchTime = SysStatus[R29_VALVE_SWITCH_TIME];
+  sysCfg.pumpNoWaterTime = SysStatus[R46_PUMP_NOWATER_TIME];
+  sysCfg.pumpCoolDownTime = SysStatus[R47_PUMP_COOLDOWN_TIME];
+  sysCfg.triggerEC = SysStatus[R48_EC_TRIGGER];
+  sysCfg.triggerPH = SysStatus[R49_PH_TRIGGER];
+  sysCfg.cleaningTime = SysStatus[R50_CLEANING_TIME];
+  sysCfg.cleaningCoolDownTime = SysStatus[R51_CLEANING_COOLDOWN_TIME];
+  sysCfg.sourceFlowTime = SysStatus[R52_SOURCE_FLOW_TIME];
+  sysCfg.nbIoTProcTime = SysStatus[R53_NBIOT_TIME];
+  sysCfg.nbIoTPowerOffTime = SysStatus[R54_NBIOT_POWEROFF_TIME];
+  sysCfg.fieldMask = SysStatus[R55_FIELD_MASK];
   saveCFG(&sysCfg);
 }
 

@@ -26,7 +26,7 @@ enum SAVE_MAGIC_CMD {
 
 static modbusHandler_t  MBSettingsH;
 static uint16_t         ModusSlaveDataBuffer[MAX_SETTINGS_REG];
-volatile uint16_t       SysSettings[MAX_SETTINGS_REG];
+volatile uint16_t       SysStatus[MAX_SETTINGS_REG];
 
 void InitMbSettings(void);
 void StartMbSettingsTask(void *argument);
@@ -73,8 +73,8 @@ static void checkAndUpdateSysTime(void) {
 
   if (valNew != 0) {
     osMutexAcquire(mutexSysMyTime_id, osWaitForever);
-    SysSettings[R34_SYS_TIME_RL] = MBSettingsH.u16regs[R56_SYS_TIME_WL];
-    SysSettings[R35_SYS_TIME_RH] = MBSettingsH.u16regs[R57_SYS_TIME_WH];
+    SysStatus[R34_SYS_TIME_RL] = MBSettingsH.u16regs[R56_SYS_TIME_WL];
+    SysStatus[R35_SYS_TIME_RH] = MBSettingsH.u16regs[R57_SYS_TIME_WH];
     syncRTCTime(valNew);
     osMutexRelease(mutexSysMyTime_id);
   }
@@ -144,31 +144,31 @@ static void checkAndUpdateManualOp(void) {
 }
 
 static void updateSettingsValue(void) {
-  if (MBSettingsH.u16regs[R00_TOWER_ID] != SysSettings[R00_TOWER_ID]) {
+  if (MBSettingsH.u16regs[R00_TOWER_ID] != SysStatus[R00_TOWER_ID]) {
     DEBUG_PRINTF("Update TowerID: %d\n", MBSettingsH.u16regs[R00_TOWER_ID]);
-    SysSettings[R00_TOWER_ID] = MBSettingsH.u16regs[R00_TOWER_ID];
+    SysStatus[R00_TOWER_ID] = MBSettingsH.u16regs[R00_TOWER_ID];
   }
 
-  if (MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME] != SysSettings[R29_VALVE_SWITCH_TIME])
+  if (MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME] != SysStatus[R29_VALVE_SWITCH_TIME])
   {
     if (MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME] == 0) {
       resetCumulateDrainTime();
     }
     DEBUG_PRINTF("Reset ValeSwitch Time: %d\n", MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME]);
-    SysSettings[R29_VALVE_SWITCH_TIME] = MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME];
+    SysStatus[R29_VALVE_SWITCH_TIME] = MBSettingsH.u16regs[R29_VALVE_SWITCH_TIME];
   }
 
   for (int i = R36_RUN_MODE; i <= R55_FIELD_MASK; i++) {
-    if (SysSettings[i] != MBSettingsH.u16regs[i]) {
+    if (SysStatus[i] != MBSettingsH.u16regs[i]) {
       DEBUG_PRINTF("Update R%02d: value:%d(0x%04X)\n", i, MBSettingsH.u16regs[i], MBSettingsH.u16regs[i]);
-      SysSettings[i] = MBSettingsH.u16regs[i];
+      SysStatus[i] = MBSettingsH.u16regs[i];
     }
   }
 }
 
 static void updateModbusMappingRegisters(void) {
   for (int i = 0; i < MAX_SETTINGS_REG; i++)
-	  ModusSlaveDataBuffer[i] = SysSettings[i];
+	  ModusSlaveDataBuffer[i] = SysStatus[i];
 }
 
 static void MbSettingsProc(void) {

@@ -63,8 +63,8 @@ void basic1SecCallback(void *argument)
   sysMyTime.second = stime.Seconds;
 
   uint32_t epoch = datetime_since_epoch(&sysMyTime);
-  SysSettings[R34_SYS_TIME_RL] = (uint16_t)(epoch & 0xFFFF);
-  SysSettings[R35_SYS_TIME_RH] = (uint16_t)(epoch >> 16);
+  SysStatus[R34_SYS_TIME_RL] = (uint16_t)(epoch & 0xFFFF);
+  SysStatus[R35_SYS_TIME_RH] = (uint16_t)(epoch >> 16);
   osMutexRelease(mutexSysMyTime_id);
 #if 0
   if ((timeCount % 10) == 0) {

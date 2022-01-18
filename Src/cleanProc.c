@@ -31,21 +31,21 @@ void resetCumulateDrainTime() {
 
 static int IsTrigger(void)
 {
-    if (SysSettings[R03_EC] >= SysSettings[R48_EC_TRIGGER])
+    if (SysStatus[R03_EC] >= SysStatus[R48_EC_TRIGGER])
     {
         return 1;
     }
 
-    if (SysSettings[R49_PH_TRIGGER] > 1400)
+    if (SysStatus[R49_PH_TRIGGER] > 1400)
         return 0;
 
-    if (SysSettings[R49_PH_TRIGGER] < 700) {
-        if (SysSettings[R03_EC] <= SysSettings[R49_PH_TRIGGER]) {
+    if (SysStatus[R49_PH_TRIGGER] < 700) {
+        if (SysStatus[R03_EC] <= SysStatus[R49_PH_TRIGGER]) {
             return 1;
         }
     }
     else {
-        if (SysSettings[R03_EC] >= SysSettings[R49_PH_TRIGGER]) {
+        if (SysStatus[R03_EC] >= SysStatus[R49_PH_TRIGGER]) {
             return 1;
         }
     }
@@ -60,7 +60,7 @@ void initCleanProc(void)
 
 void CleanProc(void)
 {
-    if (SysSettings[R36_RUN_MODE] != MODE_RUNNING) {
+    if (SysStatus[R36_RUN_MODE] != MODE_RUNNING) {
         cleanState = CLEAN_OPERATION_INIT;
         return;
     }
@@ -69,8 +69,8 @@ void CleanProc(void)
     case CLEAN_OPERATION_INIT:
         DEBUG_PRINTF("CLEAN_OPERATION_INIT, TRANSTION to CHECK_WATER_QUALITY\n");
         cleanState = CHECK_WATER_QUALITY;
-        SysSettings[R27_DRAIN_TIME] = 0;
-        SysSettings[R28_CLEANING_COOLDOWN] = 0;
+        SysStatus[R27_DRAIN_TIME] = 0;
+        SysStatus[R28_CLEANING_COOLDOWN] = 0;
 
     case CHECK_WATER_QUALITY:
         if (IsTrigger()) {
@@ -82,30 +82,31 @@ void CleanProc(void)
         break;
 
     case CLEAN_RUNNING:
-        if (SysSettings[R27_DRAIN_TIME] != (getTimeCount() - cleanData.waitCounter)) {
-            SysSettings[R27_DRAIN_TIME] = getTimeCount() - cleanData.waitCounter;
-            DEBUG_PRINTF("CLEAN_RUNNING:%d, running time:%d\n", SysSettings[R27_DRAIN_TIME]);
+        if (SysStatus[R27_DRAIN_TIME] != (getTimeCount() - cleanData.waitCounter)) {
+            SysStatus[R27_DRAIN_TIME] = getTimeCount() - cleanData.waitCounter;
+            DEBUG_PRINTF("CLEAN_RUNNING:%d, running time:%d\n", SysStatus[R27_DRAIN_TIME]);
         }
-        if (SysSettings[R27_DRAIN_TIME] >= SysSettings[R50_CLEANING_TIME])  {
+        if (SysStatus[R27_DRAIN_TIME] >= SysStatus[R50_CLEANING_TIME])  {
             DEBUG_PRINTF("CLEAN_RUNNING, TRANSTION to WAIT_CLEAN_COOLDOWN\n");
             cleanState = WAIT_CLEAN_COOLDOWN;
             cleanData.waitCounter = getTimeCount();
-            cleanData.cumulateTime += SysSettings[R27_DRAIN_TIME];
-            SysSettings[R29_VALVE_SWITCH_TIME] = getCumulateDrainTime() / 60;
+            cleanData.cumulateTime += SysStatus[R27_DRAIN_TIME];
+            SysStatus[R29_VALVE_SWITCH_TIME] = getCumulateDrainTime() / 60;
+            SysStatus[R21_TOTAL_DRAIN_TIME] = getCumulateDrainTime() / 60;
             VALVE_ON_CTRL = TURN_OFF_VALVE;
         }
         break;
 
     case WAIT_CLEAN_COOLDOWN:
-        if (SysSettings[R28_CLEANING_COOLDOWN] != (getTimeCount() - cleanData.waitCounter)) {
-            SysSettings[R28_CLEANING_COOLDOWN] = getTimeCount() - cleanData.waitCounter;
-            DEBUG_PRINTF("WAIT_CLEAN_COOLDOWN:%d, cooldown time:%d\n", SysSettings[R28_CLEANING_COOLDOWN]);
+        if (SysStatus[R28_CLEANING_COOLDOWN] != (getTimeCount() - cleanData.waitCounter)) {
+            SysStatus[R28_CLEANING_COOLDOWN] = getTimeCount() - cleanData.waitCounter;
+            DEBUG_PRINTF("WAIT_CLEAN_COOLDOWN:%d, cooldown time:%d\n", SysStatus[R28_CLEANING_COOLDOWN]);
         }
-        if (SysSettings[R28_CLEANING_COOLDOWN] > SysSettings[R51_CLEANING_COOLDOWN_TIME]) {
+        if (SysStatus[R28_CLEANING_COOLDOWN] > SysStatus[R51_CLEANING_COOLDOWN_TIME]) {
             DEBUG_PRINTF("Finish WAIT_CLEAN_COOLDOWN, TRANSTION to CHECK_WATER_QUALITY\n");
             cleanState = CHECK_WATER_QUALITY;
-            SysSettings[R27_DRAIN_TIME] = 0;
-            SysSettings[R28_CLEANING_COOLDOWN] = 0;
+            SysStatus[R27_DRAIN_TIME] = 0;
+            SysStatus[R28_CLEANING_COOLDOWN] = 0;
         }
         break;
 
