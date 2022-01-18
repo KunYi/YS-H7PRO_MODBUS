@@ -58,16 +58,16 @@ void basic1SecCallback(void *argument)
   sysMyTime.year = sdate.Year + 2000;
   sysMyTime.month = sdate.Month;
   sysMyTime.day = sdate.Date;
+  sysMyTime.hour = stime.Hours;
   sysMyTime.minute = stime.Minutes;
   sysMyTime.second = stime.Seconds;
-
 
   uint32_t epoch = datetime_since_epoch(&sysMyTime);
   SysSettings[R34_SYS_TIME_RL] = (uint16_t)(epoch & 0xFFFF);
   SysSettings[R35_SYS_TIME_RH] = (uint16_t)(epoch >> 16);
   osMutexRelease(mutexSysMyTime_id);
 #if 0
-  if ((count % 10) == 0) {
+  if ((timeCount % 10) == 0) {
     SEGGER_RTT_printf(0, "current date:time %0.2d/%0.2d/%0.4d, ", sdate.Month, sdate.Date, sdate.Year + 2000);
     SEGGER_RTT_printf(0, "%0.2d:%0.2d:%0.2d \n", stime.Hours, stime.Minutes, stime.Seconds);
     /*
