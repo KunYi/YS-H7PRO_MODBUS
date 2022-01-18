@@ -36,7 +36,13 @@ void StartMbReadSensorsTask(void *argument)
   }
 }
 
-static void MbReadSensorsProc(void) {
+static bool isCoTemp(void)
+{
+  return ((SysSettings[R55_FIELD_MASK] & (1 << 0)) != 0);
+}
+
+static void readEC(void)
+{
   modbus_t telegram;
   uint32_t u32NotificationValue;
 
@@ -55,7 +61,12 @@ static void MbReadSensorsProc(void) {
     DEBUG_PRINTF("read EC:0x%04X(%d)\r\n", u16EC, u16EC);
     SysSettings[R03_EC] = u16EC;
   }
-  osDelay(1);
+}
+
+static void readPH(void)
+{
+  modbus_t telegram;
+  uint32_t u32NotificationValue;
 
   telegram.u8id = SENSOR_PH; // slave address
   telegram.u8fct = MB_FC_READ_REGISTERS; // function code 03, only support the code
@@ -72,49 +83,73 @@ static void MbReadSensorsProc(void) {
     DEBUG_PRINTF("read PH:0x%04X(%d)\r\n", u16PH, u16PH);
     SysSettings[R04_PH] = u16PH;
   }
-  osDelay(1);
+}
+
+static void readTemp(void)
+{
+  modbus_t telegram;
+  uint32_t u32NotificationValue;
+  bool coTempSensors = isCoTemp();
 
   telegram.u8id = SENSOR_TEMP1;
   telegram.u8fct = MB_FC_READ_REGISTERS; // function code
   telegram.u16RegAdd = 40; // 0x28
-  telegram.u16CoilsNo = 4;
+  telegram.u16CoilsNo = (coTempSensors) ? 2 : 4;
   telegram.u16reg = u16Temp1Array;
   ModbusQuery(&ModbusMasterH, telegram);
   u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
   if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
     // error handler
-    INFO_PRINTF(RTT_CTRL_TEXT_BRIGHT_RED "read temperature failed\r\n");
+    INFO_PRINTF(RTT_CTRL_TEXT_BRIGHT_RED "read temperature failed\n");
     INFO_PRINTF(RTT_CTRL_RESET);
-  } else {
-    DEBUG_PRINTF("read Temp1 ch0:%d ch1:%d ch2:%d ch3:%d\r\n",
+  }
+  else {
+    DEBUG_PRINTF("read Temp1 ch0:%d ch1:%d ch2:%d ch3:%d\n",
     u16Temp1Array[0], u16Temp1Array[1], u16Temp1Array[2], u16Temp1Array[3]);
     SysSettings[R01_TEMP1_IN] = u16Temp1Array[0];
     SysSettings[R02_TEMP1_OUT] = u16Temp1Array[1];
-    SysSettings[R07_TEMP2_IN] = u16Temp1Array[2];
-    SysSettings[R08_TEMP2_OUT] = u16Temp1Array[3];
+    if (coTempSensors) {
+      SysSettings[R07_TEMP2_IN] = u16Temp1Array[0];
+      SysSettings[R08_TEMP2_OUT] = u16Temp1Array[1];
+    } else {
+      SysSettings[R07_TEMP2_IN] = u16Temp1Array[2];
+      SysSettings[R08_TEMP2_OUT] = u16Temp1Array[3];
+    }
   }
-  osDelay(1);
 
-  telegram.u8id = SENSOR_TEMP2;
-  telegram.u8fct = MB_FC_READ_REGISTERS; // function code
-  telegram.u16RegAdd = 40; // 0x28
-  telegram.u16CoilsNo = 4;
-  telegram.u16reg = u16Temp2Array;
-  ModbusQuery(&ModbusMasterH, telegram);
-  u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-  if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
-    // error handler
-    INFO_PRINTF(RTT_CTRL_TEXT_BRIGHT_RED "read temperature failed\r\n");
-    INFO_PRINTF(RTT_CTRL_RESET);
-  } else {
-    DEBUG_PRINTF("read Temp2 ch0:%d ch1:%d ch2:%d ch3:%d\r\n",
-    u16Temp2Array[0], u16Temp2Array[1], u16Temp2Array[2], u16Temp2Array[3]);
-    SysSettings[R09_TEMP3_IN] = u16Temp1Array[0];
-    SysSettings[R10_TEMP3_OUT] = u16Temp1Array[1];
-    SysSettings[R11_TEMP4_IN] = u16Temp1Array[2];
-    SysSettings[R12_TEMP4_OUT] = u16Temp1Array[3];
+  if (coTempSensors) {
+      SysSettings[R09_TEMP3_IN] = u16Temp1Array[0];
+      SysSettings[R10_TEMP3_OUT] = u16Temp1Array[1];
+      SysSettings[R11_TEMP4_IN] = u16Temp1Array[0];
+      SysSettings[R12_TEMP4_OUT] = u16Temp1Array[1];
   }
-  osDelay(1);
+  else {
+    telegram.u8id = SENSOR_TEMP2;
+    telegram.u8fct = MB_FC_READ_REGISTERS; // function code
+    telegram.u16RegAdd = 40; // 0x28
+    telegram.u16CoilsNo = 4;
+    telegram.u16reg = u16Temp2Array;
+    ModbusQuery(&ModbusMasterH, telegram);
+    u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
+    // error handler
+      INFO_PRINTF(RTT_CTRL_TEXT_BRIGHT_RED "read temperature failed\r\n");
+      INFO_PRINTF(RTT_CTRL_RESET);
+    } else {
+      DEBUG_PRINTF("read Temp2 ch0:%d ch1:%d ch2:%d ch3:%d\r\n",
+      u16Temp2Array[0], u16Temp2Array[1], u16Temp2Array[2], u16Temp2Array[3]);
+      SysSettings[R09_TEMP3_IN] = u16Temp1Array[0];
+      SysSettings[R10_TEMP3_OUT] = u16Temp1Array[1];
+      SysSettings[R11_TEMP4_IN] = u16Temp1Array[2];
+      SysSettings[R12_TEMP4_OUT] = u16Temp1Array[3];
+    }
+  }
+}
+
+static void SetDO(void)
+{
+  modbus_t telegram;
+  uint32_t u32NotificationValue;
 
   u16DIO = sysOut._out;
   telegram.u8id = MB_DIO;
@@ -126,29 +161,46 @@ static void MbReadSensorsProc(void) {
   u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
   if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
     // error handler
-    INFO_PRINTF(RTT_CTRL_TEXT_BRIGHT_RED "write DIO failed\r\n");
+    INFO_PRINTF(RTT_CTRL_TEXT_BRIGHT_RED "write DIO failed\n");
     INFO_PRINTF(RTT_CTRL_RESET);
   } else {
-    DEBUG_PRINTF(0, "write DIO:%04X(%03d)\r\n", u16DIO, u16DIO);
+    DEBUG_PRINTF("Write DIO:0x%04X\n", u16DIO);
   }
-  osDelay(1);
+}
 
+static void GetDI(void)
+{
+  modbus_t telegram;
+  uint32_t u32NotificationValue;
+
+  u16DIO = 0;
   telegram.u8id = MB_DIO;
   telegram.u8fct = MB_FC_READ_REGISTERS; // function code
   telegram.u16RegAdd = 0x04;
   telegram.u16CoilsNo = 1;
   telegram.u16reg = &u16DIO;
   ModbusQuery(&ModbusMasterH, telegram);
-  u16DIO++;
   u32NotificationValue = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
   if (u32NotificationValue != (uint32_t)ERR_OK_QUERY) {
     // error handler
-    INFO_PRINTF(RTT_CTRL_TEXT_BRIGHT_RED "read DIO failed\r\n");
+    INFO_PRINTF(RTT_CTRL_TEXT_BRIGHT_RED "read DIO failed\n");
     INFO_PRINTF(RTT_CTRL_RESET);
   } else {
-    DEBUG_PRINTF(0, "read DIO:%04X(%03d)\r\n", u16DIO, u16DIO);
+    DEBUG_PRINTF("read DIO:0x%04X\n", u16DIO);
     sysIn._in = (u16DIO & 0xFF);
   }
+}
+
+static void MbReadSensorsProc(void) {
+  readEC();
+  osDelay(2);
+  readPH();
+  osDelay(2);
+  readTemp();
+  osDelay(2);
+  GetDI();
+  osDelay(2);
+  SetDO();
 }
 
 void InitMbReadSensors(void) {
@@ -163,7 +215,7 @@ void InitMbReadSensors(void) {
   ModbusMasterH.xTypeHW = USART_HW;
   ModbusMasterH.port = &MODBUS_MASTER_UART;
   ModbusMasterH.u8id = 0; // for Mastter
-  ModbusMasterH.u16timeOut = 1000;
+  ModbusMasterH.u16timeOut = 400;
   ModbusMasterH.EN_Port = NULL; // No RS485
   ModbusMasterH.u8coils = NULL;
   ModbusMasterH.u8coilsmask = NULL;
