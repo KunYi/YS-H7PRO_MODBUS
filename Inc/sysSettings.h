@@ -30,7 +30,7 @@ enum OffsetMBSetting {
     R22_OP_TOWER_NUM = 22,
     R23_OP_MINUTE = 23,                 /* for display tower operation time */
     R24_DIGITAL_INPUT = 24,             /* Digital Input */
-    R25_RESERVE = 25,
+    R25_DIGITAL_OUTPUT = 25,
     R26_RESERVE = 26,
     R27_DRAIN_TIME = 27,
     R28_CLEANING_COOLDOWN = 28,

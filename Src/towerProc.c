@@ -29,8 +29,8 @@ static struct TowerOperationData towerData;
 static uint8_t isRunning;
 
 uint32_t dbgCount = 0;
-#define SIMULATION_FLOW_ON        1
-#define SIMULATION_PUMP_ON        1
+//#define SIMULATION_FLOW_ON        1
+//#define SIMULATION_PUMP_ON        1
 
 static int isEnabledTowerX(uint8_t num)
 {
@@ -133,7 +133,7 @@ void TowerProc(void)
   case CHECK_FLOW_ACTIVE:
     /* check water flow status */
     if (FLOW_STATUS == FLOW_ACTIVE_STATUS) {
-      DEBUG_PRINTF("TRANSTION to WAIT_PUMP_COOLDOWN\n");
+      DEBUG_PRINTF("TRANSTION to TOWER_RUNNING\n");
       towerState = TOWER_RUNNING;
       towerData.continueTowerFailed = 0;
       towerData.waitCounter = getTimeCount(); // for running time

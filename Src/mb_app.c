@@ -16,6 +16,7 @@
 #include "debug.h"
 #include "defaultConfig.h"
 
+#define MODBUS_TIMEOUT   (300) /* 300ms */
 modbusHandler_t ModbusMasterH;
 uint16_t        u16EC;
 uint16_t        u16PH;
@@ -164,7 +165,7 @@ static void SetDO(void)
     INFO_PRINTF(RTT_CTRL_TEXT_BRIGHT_RED "write DIO failed\n");
     INFO_PRINTF(RTT_CTRL_RESET);
   } else {
-    DEBUG_PRINTF("Write DIO:0x%04X\n", u16DIO);
+    SysStatus[R25_DIGITAL_OUTPUT] = u16DIO;
   }
 }
 
@@ -186,7 +187,6 @@ static void GetDI(void)
     INFO_PRINTF(RTT_CTRL_TEXT_BRIGHT_RED "read DIO failed\n");
     INFO_PRINTF(RTT_CTRL_RESET);
   } else {
-    DEBUG_PRINTF("read DIO:0x%04X\n", u16DIO);
     sysIn._in = (u16DIO & 0xFF);
     SysStatus[R24_DIGITAL_INPUT] = u16DIO;
   }
@@ -216,7 +216,7 @@ void InitMbReadSensors(void) {
   ModbusMasterH.xTypeHW = USART_HW;
   ModbusMasterH.port = &MODBUS_MASTER_UART;
   ModbusMasterH.u8id = 0; // for Mastter
-  ModbusMasterH.u16timeOut = 400;
+  ModbusMasterH.u16timeOut = MODBUS_TIMEOUT;
   ModbusMasterH.EN_Port = NULL; // No RS485
   ModbusMasterH.u8coils = NULL;
   ModbusMasterH.u8coilsmask = NULL;

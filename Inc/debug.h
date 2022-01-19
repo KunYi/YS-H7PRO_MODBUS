@@ -7,7 +7,7 @@
 #define DEBUG_ENABLED 0 /* default disable, please to setting in project or makefile */
 #endif
 #ifndef INFO_ENABLED
-#define INFO_ENABLED  1
+#define INFO_ENABLED  0
 #endif
 
 #define DEBUG_PRINTF(fmt, ...) \
