@@ -53,6 +53,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+extern IWDG_HandleTypeDef hiwdg1;
 extern struct SystemSettings*  pSysSettings;
 
 osThreadId_t dbgTaskHandle;
@@ -204,6 +205,7 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
+    HAL_IWDG_Refresh(&hiwdg1);
     TowerProc();
     CleanProc();
     modbusIoTProc();
