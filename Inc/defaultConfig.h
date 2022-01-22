@@ -2,17 +2,21 @@
 #ifndef __DEFAULT_CONF_H
 #define __DEFAULT_CONF_H
 
-#define MODBUS_SETTINGS_UART   huart3 /* USB to COM, for settings*/
-#define MODBUS_MASTER_UART     huart4 /* RS485 Port 1 for Sensor*/
-#define MODBUS_IOT_UART        huart8 /* RS485 Port 2, PE0, PE1 UART8 for NB-IOT*/
+#define MODBUS_SETTINGS_UART        huart3 /* USB to COM, for settings*/
+#define MODBUS_SETTINGS_BAUDRATE    (115200)
+#define MODBUS_MASTER_UART          huart4 /* RS485 Port 1 for Sensor*/
+#define MODBUS_SENSOR_BAUDRATE      (9600)
+#define MODBUS_IOT_UART             huart8 /* RS485 Port 2, PE0, PE1 UART8 for NB-IOT*/
+#define MODBUS_IOT_TIMEOUT          (200)  /* the gateway not a modbus slave device, just a transparent device so not response */
+#define MODBUS_IOT_BAUDRATE         (115200)
 
-#define MODBUS_SLAVE_ID	       (1)
-#define TOWER_ID               (12345)
+#define MODBUS_SLAVE_ID             (1)
+#define TOWER_ID                    (12345)
 
 /* for NBIOT */
-#define UPLOAD_PERIOD          (15 * 60)    /* 15 minutes   */
-#define WAIT_FIRST_UPLOAD      (3*60 + 30)  /* 3.5 minutes  */
-#define TURNOFF_TIME           (30)         /* 30 seoncd    */
+#define UPLOAD_PERIOD               (15 * 60)    /* 15 minutes   */
+#define WAIT_FIRST_UPLOAD           (50)  		/* 50 seconds   */
+#define TURNOFF_TIME                (30)         /* 30 seoncd    */
 
 /* BCD format */
 /* default 01/20/2022, 19:30:30 */
@@ -32,5 +36,5 @@
 
 #define MB_DIO                 (20)
 
-#define MB_NBIOT               (1)
+#define MB_NBIOT               (02) /* test need slave id equal '2', maybe backend filter for only this ID */
 #endif /* end of __DEFAULT_CONF_H */
